@@ -40,23 +40,6 @@ from django.utils.translation import ugettext_lazy as _
 #test_action.short_description = "Test Action"
 
 
-class OwnDomainListFilter(SimpleListFilter):
-    title = _('domain')
-    parameter_name = 'domain'
-
-    def lookups(self, request, model_admin):
-        Domain = cache.get_model('powerdns_manager', 'Domain')
-        qs = Domain.objects.filter(created_by=request.user)
-        for namespace in qs:
-            yield (namespace, namespace)
-
-    def queryset(self, request, queryset):
-        the_domain = self.value()
-        if the_domain:
-            return queryset.filter(domain__name=the_domain, domain__created_by=request.user)
-        return queryset
-
-
 class RecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     fields = ('name', 'type', 'ttl', 'prio', 'content', 'auth', 'date_modified')
