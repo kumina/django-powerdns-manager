@@ -113,7 +113,7 @@ class Record(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True, db_index=True, verbose_name=_('name'), help_text="""Actual name of a record. Must not end in a '.' and be fully qualified - it is not relative to the name of the domain!  For example: www.test.com (no trailing dot)""")
     # TODO: Why type allows NULL?
     type = models.CharField(max_length=10, blank=True, null=True, db_index=True, choices=RECORD_TYPE_CHOICES, verbose_name=_('type'), help_text="""Select the record type.""")
-    content = models.CharField(max_length=64000, blank=True, null=True, verbose_name=_('content'), help_text="""This is the 'right hand side' of a DNS record. For an A record, this is the IP address for example.""")
+    content = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('content'), help_text="""This is the 'right hand side' of a DNS record. For an A record, this is the IP address for example.""")
     ttl = models.PositiveIntegerField(max_length=11, blank=True, null=True, default=settings.PDNS_DEFAULT_RR_TTL, verbose_name=_('TTL'), help_text="""How long the DNS-client are allowed to remember this record. Also known as Time To Live(TTL) This value is in seconds.""")
     prio = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('priority'), help_text="""For MX records, this should be the priority of the mail exchanger specified.""")
     # Extra fields for DNSSEC (http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database)
