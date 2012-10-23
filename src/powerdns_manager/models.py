@@ -245,9 +245,6 @@ class CryptoKey(models.Model):
         verbose_name_plural = _('crypto keys')
         get_latest_by = 'date_modified'
         ordering = ['domain']
-        unique_together = (
-            ('domain', 'flags'), # TODO: check this
-        )
         
     def __unicode__(self):
         return self.domain.name
