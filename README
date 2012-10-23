@@ -1,6 +1,10 @@
 django-powerdns-manager
 ========================================================================
 
+**THIS SOFTWARE IS AT A VERY EARLY STAGE OF DEVELOPMENT**
+
+**NOT SUITABLE EVEN FOR TESTING. YOU HAVE BEEN WARNED.**
+
 | **Author**: `George Notaras <http://www.g-loaded.eu/>`_
 | **Development Web Site**: `django-powerdns-manager project <http://www.codetrax.org/projects/django-powerdns-manager>`_
 | **Source Code Repository**: `django-powerdns-manager source code <https://source.codetrax.org/hgroot/django-powerdns-manager>`_
