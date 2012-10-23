@@ -101,7 +101,7 @@ class DomainAdmin(admin.ModelAdmin):
         qs = super(DomainAdmin, self).queryset(request)
         if not request.user.is_superuser:
             # Non-superusers see the domains they have created
-            qs = qs.filter(name__created_by=request.user)
+            qs = qs.filter(created_by=request.user)
         return qs
     
     def save_model(self, request, obj, form, change):
