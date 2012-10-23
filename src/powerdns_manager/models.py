@@ -41,8 +41,8 @@ class Domain(models.Model):
     """Model for PowerDNS domain."""
     
     DOMAIN_TYPE_CHOICES = (
-        ('MASTER', 'Master'),
         ('NATIVE', 'Native'),
+        ('MASTER', 'Master'),
         ('SLAVE', 'Slave'),
         #('SUPERSLAVE', 'Superslave'),
     )
