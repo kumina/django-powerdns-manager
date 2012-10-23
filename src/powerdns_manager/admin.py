@@ -61,7 +61,7 @@ class RecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     fields = ('name', 'type', 'ttl', 'prio', 'content', 'auth', 'date_modified')
     readonly_fields = ('date_modified', )
-    extra = 1
+    extra = 3
 
 class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
