@@ -1,0 +1,3 @@
+django-powerdns-manager
+Django
+Sphinx
