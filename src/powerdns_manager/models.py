@@ -148,9 +148,7 @@ class Record(models.Model):
 class SuperMaster(models.Model):
     """Model for PowerDNS supermasters.
     
-    More on supermasters:
-    
-        http://doc.powerdns.com/slave.html#supermaster
+    More on supermasters: http://doc.powerdns.com/slave.html#supermaster
     
     PDNS can recognize so called 'supermasters'. A supermaster is a host which
     is master for domains and for which we are to be a slave. When a master
@@ -192,9 +190,7 @@ class SuperMaster(models.Model):
 class DomainMetadata(models.Model):
     """Model for PowerDNS domain metadata.
     
-    More on domain metadata:
-    
-        http://doc.powerdns.com/domainmetadata.html
+    More on domain metadata: http://doc.powerdns.com/domainmetadata.html
     
     """
     PER_ZONE_METADATA_CHOICES = (
@@ -234,9 +230,7 @@ class DomainMetadata(models.Model):
 class CryptoKey(models.Model):
     """Model for PowerDNS domain crypto keys.
     
-    See:
-    
-        http://doc.powerdns.com/dnssec-supported.html
+    See: http://doc.powerdns.com/dnssec-supported.html
     
     """
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain', verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""))
@@ -267,9 +261,7 @@ class CryptoKey(models.Model):
 class TsigKey(models.Model):
     """Model for PowerDNS domain TSIG keys.
     
-    See:
-    
-        http://doc.powerdns.com/tsig.html
+    See: http://doc.powerdns.com/tsig.html
     
     """
     ALGORITHM_CHOICES = (
