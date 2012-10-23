@@ -1,9 +1,9 @@
 django-powerdns-manager
 ========================================================================
 
-**THIS SOFTWARE IS AT A VERY EARLY STAGE OF DEVELOPMENT**
+THIS SOFTWARE IS PRE-ALPHA - NOT READY FOR TESTING
+==================================================
 
-**NOT SUITABLE EVEN FOR TESTING. YOU HAVE BEEN WARNED.**
 
 | **Author**: `George Notaras <http://www.g-loaded.eu/>`_
 | **Development Web Site**: `django-powerdns-manager project <http://www.codetrax.org/projects/django-powerdns-manager>`_
@@ -20,8 +20,9 @@ exists in the license_ section.
 Features
 ========
 
-- Feature A
-- Feature B
+- Supports DNSSEC
+- Multiuser
+- 
 
 
 Documentation
