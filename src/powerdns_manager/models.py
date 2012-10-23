@@ -217,9 +217,6 @@ class DomainMetadata(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['kind']
         order_with_respect_to = 'domain'
-        unique_together = (
-            ('domain', 'kind'), # TODO: check this
-        )
         
     def __unicode__(self):
         return self.kind
