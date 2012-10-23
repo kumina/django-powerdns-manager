@@ -56,7 +56,7 @@ class Domain(models.Model):
     # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
-    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
+    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
     
     class Meta:
         db_table = 'domains'
@@ -275,7 +275,7 @@ class TsigKey(models.Model):
     # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
-    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', verbose_name=_('created by'), help_text="""The Django user this TSIG key belongs to.""")
+    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this TSIG key belongs to.""")
 
 
     class Meta:
