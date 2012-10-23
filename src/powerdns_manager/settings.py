@@ -32,7 +32,7 @@ PDNS_DEFAULT_ZONE_TYPE = getattr(settings, 'PDNS_DEFAULT_ZONE_TYPE', 'NATIVE')
 PDNS_DEFAULT_RR_TTL = getattr(settings, 'PDNS_DEFAULT_RR_TTL', 3600)
 
 # Defaults to first super user
-PDNS_DEFAULT_DOMAIN_OWNER_ID = getattr(settings, 'PDNS_DEFAULT_DOMAIN_OWNER_ID', 1)
+PDNS_DEFAULT_OWNER_ID = getattr(settings, 'PDNS_DEFAULT_OWNER_ID', 1)
 
 # Declares the server a SLAVE -- Will be used internally
 PDNS_IS_SLAVE = getattr(settings, 'PDNS_IS_SLAVE', False)
