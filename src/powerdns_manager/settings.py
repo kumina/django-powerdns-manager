@@ -27,5 +27,7 @@
 from django.conf import settings
 
 
-MY_APP_SETTING = getattr(settings, 'MY_APP_SETTING', '...')
+PDNS_DEFAULT_ZONE_TYPE = getattr(settings, 'PDNS_DEFAULT_ZONE_TYPE', 'NATIVE')
+
+PDNS_DEFAULT_RR_TTL = getattr(settings, 'PDNS_DEFAULT_RR_TTL', 3600)
 
