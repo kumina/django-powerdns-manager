@@ -28,6 +28,7 @@ from django.contrib import admin
 from django.db.models.loading import cache
 from django.contrib import messages
 from django.contrib.admin import SimpleListFilter
+from django.utils.translation import ugettext_lazy as _
 
 # Action for
 # - set change date
@@ -66,8 +67,14 @@ class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
     fields = ('kind', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
-    extra = 1
+    extra = 0
     
+class CryptoKeyInline(admin.TabularInline):
+    model = cache.get_model('powerdns_manager', 'CryptoKey')
+    fields = ('flags', 'active', 'content', 'date_modified')
+    readonly_fields = ('date_modified', )
+    extra = 0
+
 
 class DomainAdmin(admin.ModelAdmin):
     #form = DomainModelForm
@@ -88,7 +95,7 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'master', 'date_created', 'date_modified')
     list_filter = ('type', )
     search_fields = ('name', 'master')
-    inlines = [RecordInline, DomainMetadataInline]
+    inlines = [RecordInline, DomainMetadataInline, CryptoKeyInline]
     
     def queryset(self, request):
         qs = super(DomainAdmin, self).queryset(request)
@@ -104,11 +111,6 @@ class DomainAdmin(admin.ModelAdmin):
 
 admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
-
-
-
-
-    
 
 
 class TsigKeyAdmin(admin.ModelAdmin):
