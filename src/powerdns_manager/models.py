@@ -178,7 +178,7 @@ class SuperMaster(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['nameserver']
         unique_together = (
-            ('ip', 'nameserver'),
+            ('ip', 'nameserver'),   # This is custom addition. check if causes problems
             #('nameserver', 'account'),    # TODO: check what account really is
         )
 
