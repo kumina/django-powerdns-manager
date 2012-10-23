@@ -53,6 +53,7 @@ class Domain(models.Model):
     notified_serial = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('notified serial'), help_text="""The last notified serial of a master domain. This is updated from the SOA record of the domain.""")
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Determine if a certain host is a supermaster for a certain domain name. (???)""")
 
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
@@ -121,6 +122,7 @@ class Record(models.Model):
     # This should be set on every save  manually
     change_date = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
 
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
@@ -168,6 +170,7 @@ class SuperMaster(models.Model):
     nameserver = models.CharField(max_length=255, unique=True, verbose_name=_('nameserver'), help_text="""Hostname of the supermaster.""")
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Account name (???)""")
 
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
@@ -208,6 +211,7 @@ class DomainMetadata(models.Model):
     kind = models.CharField(max_length=16, choices=PER_ZONE_METADATA_CHOICES, verbose_name=_('setting'), help_text="""Select a setting.""")
     content = models.TextField(blank=True, null=True, verbose_name=_('content'), help_text="""Enter the metadata.""")
     
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
@@ -241,6 +245,7 @@ class CryptoKey(models.Model):
     # TODO: Check if content may be empty
     content = models.TextField(blank=True, null=True, verbose_name=_('content'), help_text="""Enter the key data.""")
     
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
@@ -275,6 +280,7 @@ class TsigKey(models.Model):
     algorithm = models.CharField(max_length=50, choices=ALGORITHM_CHOICES, verbose_name=_('algorithm'), help_text="""Select hashing algorithm.""")
     secret = models.CharField(max_length=255, verbose_name=_('secret'), help_text="""Enter the shared secret.""")
 
+    # PowerDNS Manager internal fields
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
