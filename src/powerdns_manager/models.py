@@ -142,7 +142,7 @@ class Record(models.Model):
 #name convert to lowercase
 # change_date This should be set on every save  manually
 # should be set automatically on every save
-
+# No more than one SOA for a domain
 
 
 class SuperMaster(models.Model):
