@@ -83,7 +83,6 @@ class Record(models.Model):
         
         http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database
     
-    
     """
     RECORD_TYPE_CHOICES = (
         ('A', 'A'),
