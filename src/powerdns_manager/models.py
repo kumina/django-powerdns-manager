@@ -54,7 +54,7 @@ class Domain(models.Model):
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Determine if a certain host is a supermaster for a certain domain name. (???)""")
 
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
+    #date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
     
@@ -122,7 +122,6 @@ class Record(models.Model):
     change_date = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
 
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
     class Meta:
@@ -168,7 +167,6 @@ class SuperMaster(models.Model):
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Account name (???)""")
 
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
     class Meta:
@@ -207,7 +205,6 @@ class DomainMetadata(models.Model):
     content = models.TextField(blank=True, null=True, verbose_name=_('content'), help_text="""Enter the metadata.""")
     
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
     class Meta:
@@ -236,7 +233,6 @@ class CryptoKey(models.Model):
     content = models.TextField(blank=True, null=True, verbose_name=_('content'), help_text="""Enter the key data.""")
     
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
 
     class Meta:
@@ -266,7 +262,6 @@ class TsigKey(models.Model):
     secret = models.CharField(max_length=255, verbose_name=_('secret'), help_text="""Enter the shared secret.""")
 
     # PowerDNS Manager internal fields
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this TSIG key belongs to.""")
 
