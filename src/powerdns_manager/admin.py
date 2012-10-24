@@ -97,19 +97,9 @@ class DomainAdmin(admin.ModelAdmin):
     #form = DomainModelForm
     #actions = [test_action, ]
     
-    fieldsets = (
-        ('', {
-            'fields' : ('name', 'type', 'master'),
-            #'description' : 'Main virtual host attributes',
-        }),
-        ('Info', {
-            'classes' : ('collapse',),
-            'fields' : ('date_created', 'date_modified', ),
-            #'description' : 'Information about the domain.',
-        }),
-    )
-    readonly_fields = ('date_created', 'date_modified', )
-    list_display = ('name', 'type', 'master', 'date_created', 'date_modified')
+    fields = ('name', 'type', 'master', 'date_modified')
+    readonly_fields = ('date_modified', )
+    list_display = ('name', 'type', 'master', 'date_modified')
     list_filter = ('type', )
     search_fields = ('name', 'master')
     inlines = [SoaRecordInline, RecordInline, DomainMetadataInline, CryptoKeyInline]
@@ -157,17 +147,9 @@ admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
 
 class TsigKeyAdmin(admin.ModelAdmin):
-    fieldsets = (
-        ('', {
-            'fields' : ('name', 'algorithm', 'secret', ),
-        }),
-        ('Info', {
-            'classes' : ('collapse',),
-            'fields' : ('date_created', 'date_modified', ),
-        }),
-    )
-    readonly_fields = ('date_created', 'date_modified')
-    list_display = ('name', 'algorithm', 'date_created', 'date_modified')
+    fields = ('name', 'algorithm', 'secret', 'date_modified')
+    readonly_fields = ('date_modified', )
+    list_display = ('name', 'algorithm', 'date_modified')
     list_filter = ('algorithm', )
     search_fields = ('name', )
     verbose_name = 'TSIG Key'
@@ -190,9 +172,9 @@ admin.site.register(cache.get_model('powerdns_manager', 'TsigKey'), TsigKeyAdmin
 
 
 class SuperMasterAdmin(admin.ModelAdmin):
-    fields = ('ip', 'nameserver', 'account')
-    readonly_fields = ('date_created', 'date_modified')
-    list_display = ('ip', 'nameserver', 'account', 'date_created', 'date_modified')
+    fields = ('ip', 'nameserver', 'account', 'date_modified')
+    readonly_fields = ('date_modified', )
+    list_display = ('ip', 'nameserver', 'account', 'date_modified')
     search_fields = ('nameserver', 'account')
     verbose_name = 'SuperMaster'
     verbose_name_plural = 'SuperMasters'
