@@ -29,7 +29,7 @@ from django.conf import settings
 
 PDNS_DEFAULT_ZONE_TYPE = getattr(settings, 'PDNS_DEFAULT_ZONE_TYPE', 'NATIVE')
 
-PDNS_DEFAULT_RR_TTL = getattr(settings, 'PDNS_DEFAULT_RR_TTL', 3600)
+PDNS_DEFAULT_RR_TTL = getattr(settings, 'PDNS_DEFAULT_RR_TTL', 86400)
 
 # Declares the server a SLAVE -- Will be used internally
 PDNS_IS_SLAVE = getattr(settings, 'PDNS_IS_SLAVE', False)
