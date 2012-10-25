@@ -41,28 +41,24 @@ class SoaRecordModelForm(forms.ModelForm):
     
         primary hostmaster serial refresh retry expire default_ttl
     
-    This is way too inconvenient to edit.
+    This is too inconvenient to edit.
     
     See: http://doc.powerdns.com/types.html#soa-type
     
-    To deal with this problem we add separate form fields to the modelform
+    To deal with this problem we add separate form fields to the ModelForm
     for each one of the pieces of data that form the SOA RR content above.
     
-    When the form is initialized, these fields get their initial values from the
-    SOA RR content (see __init__() below).
+    When the form is initialized, these fields get their initial values from
+    the SOA RR content (see __init__() below).
     
     When the SOA RR is saved, the values of these extra fields
-    are concatenated to form the SOA RR content that PowerDNS expects to find
-    stored in the database. (see admin.DomainAdmin.save_formset())
+    are concatenated in save() to form the SOA RR content that PowerDNS expects
+    to find stored in the database.
     
-    This model form is used in the SoaRecordInline, which facilitates editing
-    the SOA resource record of the zone.
-      
     """
     primary = forms.CharField(max_length=96, initial='', required=True, label=_('primary nameserver'), help_text="""The name of the name server that was the original or primary source of data for this zone.""")
     hostmaster = forms.CharField(max_length=64, initial='', required=True, label=_('hostmaster mailbox'), help_text="""A name which specifies the mailbox of the person responsible for this zone. This should be specified in the mailbox-as-domain-name format where the `@' character is replaced with a dot. Example: hostmaster.domain.tld represents hostmaster@domain.tld""")
     serial = forms.IntegerField(min_value=1, initial=1, required=True, label=_('serial'), widget=forms.TextInput(attrs={'readonly': 'readonly'}), help_text="""The serial is generated automatically and is not user-editable. The serial is a "version number" for this zone. DNS servers that rely on AXFR for zone transfers use this to determine when updates have occurred. Popular values to use are the Unix timestamp or a date in the form YYYYMMDD.""")
-
     refresh = forms.IntegerField(min_value=300, initial=28800, required=True, label=_('refresh'), help_text="""The number of seconds after which slave nameservers should check to see if this zone has been changed. If the zone's serial number has changed, the slave nameserver initiates a zone transfer. Example: 28800""")
     retry = forms.IntegerField(min_value=300, initial=7200, required=True, label=_('retry'), help_text="""This specifies the number of seconds a slave nameserver should wait before retrying if it attmepts to transfer this zone but fails. Example: 7200""")
     expire = forms.IntegerField(min_value=300, initial=604800, required=True, label=_('expire'), help_text="""If for expire seconds the primary server cannot be reached, all information about the zone is invalidated on the secondary servers (i.e., they are no longer authoritative for that zone). Example: 604800""")
@@ -74,9 +70,10 @@ class SoaRecordModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """ModelForm constructor.
         
-        If the SOA RR is edited, the following code reads the existing content
-        of the ``Record.content`` field, splits the information into pieces,
-        and fills the initial data of the extra fields we have added to the form.
+        If the user edits an existing SOA RR throught the InlineModelAdmin,
+        the following code reads the existing content of the ``Record.content``
+        field, splits the information into pieces, and fills the initial data
+        of the extra fields we have added to the form.
         
         See: http://doc.powerdns.com/types.html#soa-type
         
@@ -174,15 +171,13 @@ class SrvRecordModelForm(forms.ModelForm):
 class GenericRecordModelForm(forms.ModelForm):
     """Generic ModelForm for resource records.
     
-    This special ModelForm exists for the following reasons:
-    
-    1) To manipulate the available types by excluding those RR types for
-    which a special ModelForm exists.
+    This special ModelForm manipulates the available RR types by excluding
+    those types for which a special ModelForm exists.
     
     """
     # For now we copy the types from the Record model and comment out those,
     # for which a special ModelForm exists. Lame, but that's how it is.
-    # TODO: create a modelform for each record type?
+    # TODO: create a modelform for each record type
     AVAILABLE_RECORD_TYPE_CHOICES = (
         ('A', 'A'),
         ('AAAA', 'AAAA'),
@@ -213,9 +208,6 @@ class GenericRecordModelForm(forms.ModelForm):
         model = cache.get_model('powerdns_manager', 'Record')
 
     def __init__(self, *args, **kwargs):
-        """ModelForm constructor.
-
-        """
         if kwargs.has_key('instance'):
             instance = kwargs['instance']
             if instance.pk is not None:    # This check asserts that this is an EDIT
@@ -225,10 +217,8 @@ class GenericRecordModelForm(forms.ModelForm):
         super(GenericRecordModelForm, self).__init__(*args, **kwargs)
     
     def save(self, *args, **kwargs):
-        
         if self.instance.name and self.instance.content:
             self.instance.type = self.cleaned_data.get('type_avail')
-        
         return super(GenericRecordModelForm, self).save(*args, **kwargs)
 
 
