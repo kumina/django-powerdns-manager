@@ -119,7 +119,7 @@ class Record(models.Model):
     ordername = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_('ordername'), help_text="""http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database""")
     
     # This is set to the current timestamp on every save
-    change_date = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
+    change_date = models.PositiveIntegerField(max_length=11, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
 
     # PowerDNS Manager internal fields
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
