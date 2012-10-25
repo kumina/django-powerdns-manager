@@ -42,3 +42,22 @@ def set_missing_ttl(sender, **kwargs):
     instance.ttl = settings.PDNS_DEFAULT_RR_TTL
     # TODO: consider checking the minimum TTL from the SOA record.
 
+
+def set_rr_authoritative_field(sender, **kwargs):
+    """This callback fills the ``auth`` field of the Record model.
+    
+    TODO: list the rules to fill the field.
+    
+    """ 
+    instance = kwargs['instance']   # powerdns_manager.Record instance
+
+
+def set_rr_ordername_field(sender, **kwargs):
+    """This callback fills the ``ordername`` field of the Record model.
+    
+    TODO: list the rules to fill the field.
+    
+    """ 
+    instance = kwargs['instance']   # powerdns_manager.Record instance
+
+
