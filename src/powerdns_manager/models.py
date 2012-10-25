@@ -140,7 +140,7 @@ class Record(models.Model):
 # Update ``change_date``
 signals.pre_save.connect(signal_cb.update_rr_change_date, sender=Record)
 # Set missing TTL information
-signals.pre_save.connect(signal_cb.set_missing_ttl, sender=Record)
+signals.pre_save.connect(signal_cb.set_missing_rr_ttl, sender=Record)
 
 
 
