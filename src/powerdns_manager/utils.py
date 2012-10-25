@@ -23,3 +23,113 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+
+import time
+    
+import dns.zone
+from dns.exception import DNSException
+from dns.rdataclass import *
+from dns.rdatatype import *
+
+from django.db.models.loading import cache
+
+
+
+def process_zone_file(origin, zonetext):
+    """Imports zone to the database.
+    
+    No checks for existence are performed in this file. For form processing,
+    see the ``import_zone_view`` view.
+    
+    *****
+    Special kudos to Grig Gheorghiu for demonstrating how to manage zone files
+    using dnspython in the following article:
+    
+        http://agiletesting.blogspot.com/2005/08/managing-dns-zone-files-with-dnspython.html
+    *****
+    
+    """
+    # Does not seem to be able to process unicode, so encode data to latin1
+    origin = origin.encode('latin1')
+    zonetext = zonetext.encode('latin1')
+    zonetext = zonetext.replace('\r\n', '\n')
+    
+    Domain = cache.get_model('powerdns_manager', 'Domain')
+    Record = cache.get_model('powerdns_manager', 'Record')
+    
+    try:
+        zone = dns.zone.from_text(zonetext, origin=origin, relativize=False)
+        
+        # Create a domain instance
+        the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE')
+        
+        # Create RRs
+        for name, node in zone.nodes.items():
+            rdatasets = node.rdatasets
+            
+            for rdataset in rdatasets:
+                
+                # Check instance variables of types:
+                # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes-module.html
+    
+                for rdata in rdataset:
+                    
+                    rr = Record(
+                        domain=the_domain,
+                        name=str(name).rstrip('.'), # name is the dnspython node name
+                        change_date=int(time.time()),
+                        ttl = rdataset.ttl
+                    )
+                    
+                    if rdataset.rdtype == SOA:
+                        # Set type
+                        rr.type = dns.rdatatype._by_value[SOA]  # http://www.dnspython.org/docs/1.10.0/html/dns.rdatatype-module.html#_by_value
+                        # Construct content
+                        rr.content = '%s %s %s %s %s %s %s' % (
+                            str(rdata.mname).rstrip('.'),
+                            str(rdata.rname).rstrip('.'),
+                            rdata.serial,
+                            rdata.refresh,
+                            rdata.retry,
+                            rdata.expire,
+                            rdata.minimum
+                        )
+    
+                    elif rdataset.rdtype == NS:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.NS.NS-class.html
+                        rr.type = dns.rdatatype._by_value[NS]
+                        rr.content = str(rdata.target).rstrip('.')
+    
+                    elif rdataset.rdtype == MX:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.MX.MX-class.html
+                        rr.type = dns.rdatatype._by_value[MX]
+                        rr.content = str(rdata.exchange).rstrip('.')
+                        rr.prio = rdata.preference
+                    
+                    elif rdataset.rdtype == TXT:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.TXT.TXT-class.html
+                        rr.type = dns.rdatatype._by_value[TXT]
+                        rr.content = ' '.join(rdata.strings)
+                    
+                    elif rdataset.rdtype == CNAME:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.CNAME.CNAME-class.html
+                        rr.type = dns.rdatatype._by_value[CNAME]
+                        rr.content = str(rdata.target).rstrip('.')
+                        
+                    elif rdataset.rdtype == A:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.A.A-class.html
+                        rr.type = dns.rdatatype._by_value[A]
+                        rr.content = rdata.address
+                    
+                    elif rdataset.rdtype == AAAA:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.AAAA.AAAA-class.html
+                        rr.type = dns.rdatatype._by_value[AAAA]
+                        rr.content = rdata.address
+                    
+                    # TODO: add support for more records
+                    
+                    rr.save()
+
+    except DNSException, e:
+        print e.__class__, e
+
