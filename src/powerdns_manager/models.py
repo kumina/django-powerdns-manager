@@ -141,6 +141,10 @@ class Record(models.Model):
 signals.pre_save.connect(signal_cb.update_rr_change_date, sender=Record)
 # Set missing TTL information
 signals.pre_save.connect(signal_cb.set_missing_rr_ttl, sender=Record)
+# Set ``auth`` field
+signals.pre_save.connect(signal_cb.set_rr_authoritative, sender=Record)
+# Set ``ordername`` field
+signals.pre_save.connect(signal_cb.set_rr_ordername, sender=Record)
 
 
 
