@@ -117,7 +117,7 @@ class Record(models.Model):
     prio = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('priority'), help_text="""For MX records, this should be the priority of the mail exchanger specified.""")
     # Extra fields for DNSSEC (http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database)
     auth = models.NullBooleanField(verbose_name=_('authoritative'), help_text="""The 'auth' field should be set to '1' for data for which the zone itself is authoritative, which includes the SOA record and its own NS records. The 'auth' field should be 0 however for NS records which are used for delegation, and also for any glue (A, AAAA) records present for this purpose. Do note that the DS record for a secure delegation should be authoritative!""")
-    ordername = models.CharField(max_length=255, blank=True, null=True, db_index=True, verbose_name=_('ordername'), help_text="""http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database""")
+    ordername = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_('ordername'), help_text="""http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database""")
     # This should be set on every save  manually
     change_date = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
 
