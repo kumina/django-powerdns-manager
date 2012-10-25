@@ -24,9 +24,21 @@
 #  limitations under the License.
 #
 
+import time
+
 from django.db.models.loading import cache
 
+from powerdns_manager import settings
 
-def signal_callback(sender, **kwargs):
-    instance = kwargs['instance']   # app_label.ModelName instance
-    
+
+
+def update_rr_change_date(sender, **kwargs):
+    instance = kwargs['instance']   # powerdns_manager.Record instance
+    instance.change_date = int(time.time())
+
+
+def set_missing_ttl(sender, **kwargs):
+    instance = kwargs['instance']   # powerdns_manager.Record instance
+    instance.ttl = settings.PDNS_DEFAULT_RR_TTL
+    # TODO: consider checking the minimum TTL from the SOA record.
+
