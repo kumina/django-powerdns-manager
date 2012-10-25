@@ -31,6 +31,17 @@ module to customize the functionality of *django-powerdns-manager*.
     Setting A ...
 
 
+URLS
+====
+
+Finally, edit the ``urls.py`` file of your project to add powerdns_manager's urls::
+
+    # URLs for powerdns_manager
+    urlpatterns += patterns('',
+        url('^powerdns/', include('powerdns_manager.urls')),
+    )
+    
+
 Synchronize the project database
 ================================
 
