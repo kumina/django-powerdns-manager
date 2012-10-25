@@ -63,10 +63,11 @@ class SoaRecordInline(admin.StackedInline):
     # Show exactly one form
     extra = 1
     max_num = 1
-    #verbose_name = 'origin'
+    verbose_name = 'SOA Resource Record'
     verbose_name_plural = 'SOA Resource Record' # Only one SOA RR per zone
     fields = ('name', 'ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl', 'date_modified')
     readonly_fields = ('date_modified', )
+    can_delete = False
     
     def queryset(self, request):
         """Return only SOA records"""
@@ -78,9 +79,7 @@ class NsRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     #form = 
     formset = NsRecordInlineModelFormset
-    # Show exactly one form
     extra = 0
-    #max_num = 1
     verbose_name = 'NS Resource Record'
     verbose_name_plural = 'NS Resource Records'
     fields = ('name', 'ttl', 'content', 'auth', 'date_modified')
@@ -96,9 +95,7 @@ class MxRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     #form = 
     formset = MxRecordInlineModelFormset
-    # Show exactly one form
     extra = 0
-    #max_num = 1
     verbose_name = 'MX Resource Record'
     verbose_name_plural = 'MX Resource Records'
     fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
@@ -114,9 +111,7 @@ class SrvRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     #form = 
     formset = SrvRecordInlineModelFormset
-    # Show exactly one form
     extra = 0
-    #max_num = 1
     verbose_name = 'SRV Resource Record'
     verbose_name_plural = 'SRV Resource Records'
     fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
@@ -147,12 +142,14 @@ class GenericRecordInline(admin.TabularInline):
         qs = qs.exclude(type='SRV')
         return qs
 
+
 class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
     fields = ('kind', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
     extra = 0
     verbose_name_plural = 'Domain Metadata'
+
     
 class CryptoKeyInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'CryptoKey')
