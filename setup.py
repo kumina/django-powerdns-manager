@@ -51,6 +51,8 @@ sys.path.insert(0, os.path.abspath('src'))
 from setuptools import setup
 
 from powerdns_manager import get_version
+from powerdns_manager import get_status_classifier
+
 
 def read(fname):
     """Utility function to read the README file."""
@@ -71,7 +73,7 @@ if __name__=='__main__':
         download_url = 'https://source.codetrax.org/hgroot/django-powerdns-manager',
         platforms=['any'],
         classifiers = [
-            'Development Status :: 4 - Beta',
+            get_status_classifier(),
             'Environment :: Web Environment',
             'Framework :: Django',
             'Intended Audience :: Developers',
