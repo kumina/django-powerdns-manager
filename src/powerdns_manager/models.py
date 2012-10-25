@@ -137,10 +137,8 @@ class Record(models.Model):
     def __unicode__(self):
         return self.name
 
-#name convert to lowercase
 # change_date This should be set on every save  manually
 # should be set automatically on every save
-# No more than one SOA for a domain
 
 
 class SuperMaster(models.Model):
