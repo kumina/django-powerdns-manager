@@ -71,7 +71,7 @@ class NsRecordInline(admin.TabularInline):
     extra = 0
     verbose_name = 'NS Resource Record'
     verbose_name_plural = 'NS Resource Records'
-    fields = ('name', 'ttl', 'content', 'auth', 'date_modified')
+    fields = ('name', 'ttl', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
     
     def queryset(self, request):
@@ -86,7 +86,7 @@ class MxRecordInline(admin.TabularInline):
     extra = 0
     verbose_name = 'MX Resource Record'
     verbose_name_plural = 'MX Resource Records'
-    fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
+    fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
     
     def queryset(self, request):
@@ -101,7 +101,7 @@ class SrvRecordInline(admin.TabularInline):
     extra = 0
     verbose_name = 'SRV Resource Record'
     verbose_name_plural = 'SRV Resource Records'
-    fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
+    fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
     
     def queryset(self, request):
@@ -113,7 +113,7 @@ class SrvRecordInline(admin.TabularInline):
 class GenericRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     form = GenericRecordModelForm
-    fields = ('name', 'type_avail', 'ttl', 'content', 'auth', 'date_modified')
+    fields = ('name', 'type_avail', 'ttl', 'content', 'date_modified')
     readonly_fields = ('date_modified', )
     extra = 0
     verbose_name = 'Other Resource Record'
