@@ -115,7 +115,7 @@ class Record(models.Model):
     ttl = models.PositiveIntegerField(max_length=11, null=True, default=settings.PDNS_DEFAULT_RR_TTL, verbose_name=_('TTL'), help_text="""How long the DNS-client are allowed to remember this record. Also known as Time To Live(TTL) This value is in seconds.""")
     prio = models.PositiveIntegerField(max_length=11, null=True, verbose_name=_('priority'), help_text="""For MX records, this should be the priority of the mail exchanger specified.""")
     # Extra fields for DNSSEC (http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database)
-    auth = models.NullBooleanField(default=True, verbose_name=_('authoritative'), help_text="""The 'auth' field should be set to '1' for data for which the zone itself is authoritative, which includes the SOA record and its own NS records. The 'auth' field should be 0 however for NS records which are used for delegation, and also for any glue (A, AAAA) records present for this purpose. Do note that the DS record for a secure delegation should be authoritative!""")
+    auth = models.NullBooleanField(verbose_name=_('authoritative'), help_text="""The 'auth' field should be set to '1' for data for which the zone itself is authoritative, which includes the SOA record and its own NS records. The 'auth' field should be 0 however for NS records which are used for delegation, and also for any glue (A, AAAA) records present for this purpose. Do note that the DS record for a secure delegation should be authoritative!""")
     ordername = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_('ordername'), help_text="""http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database""")
     
     # This is set to the current timestamp on every save
