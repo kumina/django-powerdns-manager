@@ -26,3 +26,7 @@
 
 from django.conf.urls.defaults import *
 
+urlpatterns = patterns('powerdns_manager.views',
+    url(r'^import/$', 'import_zone_view', name='import_zone'),
+)
+
