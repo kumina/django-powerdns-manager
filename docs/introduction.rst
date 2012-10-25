@@ -15,8 +15,9 @@ exists in the license_ section.
 Features
 ========
 
-- Feature A
-- Feature B
+- Database schema supports DNSSEC. Currently, DNSSEC features should be managed by the pdnssec utility. (no native python code yet)
+- Multiuser support
+- Zone file import (experimental)
 
 
 Documentation

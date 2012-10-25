@@ -21,7 +21,7 @@ django-powerdns-manager is a web based PowerDNS administration panel.
 
 | **Author**: `George Notaras <http://www.g-loaded.eu/>`_
 | **Development Web Site**: `django-powerdns-manager project <http://www.codetrax.org/projects/django-powerdns-manager>`_
-| **Source Code Repository**: `django-powerdns-manager source code <https://source.codetrax.org/hgroot/django-powerdns-manager>`_
+| **Source Code Repository**: `django-powerdns-manager source code <https://bitbucket.org/gnotaras/django-powerdns-manager>`_
 | **Documentation**: `django-powerdns-manager documentation <http://packages.python.org/django-powerdns-manager>`_
 | **Downloads**: `django-powerdns-manager releases <http://pypi.python.org/pypi/django-powerdns-manager>`_
 
