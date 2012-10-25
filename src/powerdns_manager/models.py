@@ -48,7 +48,7 @@ class Domain(models.Model):
     )
     name = models.CharField(max_length=255, unique=True, db_index=True, verbose_name=_('name'), help_text="""This field is the actual domainname. This is the field that powerDNS matches to when it gets a request. The domainname should be in the format of: domainname.TLD (no trailing dot)""")
     master = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('master'), help_text="""Enter a comma delimited list of nameservers that are master for this domain. This setting applies only to slave zones.""")
-    last_check = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('last check'), help_text="""Last time this domain was checked for freshness.""")
+    last_check = models.PositiveIntegerField(max_length=11, null=True, verbose_name=_('last check'), help_text="""Last time this domain was checked for freshness.""")
     type = models.CharField(max_length=6, choices=DOMAIN_TYPE_CHOICES, default=settings.PDNS_DEFAULT_ZONE_TYPE, verbose_name=_('type'), help_text="""Select the zone type. Native refers to native SQL replication. Master/Slave refers to DNS server based zone transfers.""")
     notified_serial = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('notified serial'), help_text="""The last notified serial of a master domain. This is updated from the SOA record of the domain.""")
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Determine if a certain host is a supermaster for a certain domain name. (???)""")
