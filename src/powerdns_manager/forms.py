@@ -191,7 +191,7 @@ class GenericRecordModelForm(forms.ModelForm):
         #('SOA', 'SOA'),
         ('SPF', 'SPF'),
         ('SSHFP', 'SSHFP'),
-        ('SRV', 'SRV'),
+        #('SRV', 'SRV'),
         ('TXT', 'TXT'),
     )
     type_avail = forms.ChoiceField(initial='', required=True, choices=AVAILABLE_RECORD_TYPE_CHOICES, label=_('type'), help_text="""Select the resource record type.""")
