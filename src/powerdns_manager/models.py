@@ -176,10 +176,10 @@ class SuperMaster(models.Model):
         verbose_name_plural = _('supermasters')
         get_latest_by = 'date_modified'
         ordering = ['nameserver']
-        unique_together = (
-            ('ip', 'nameserver'),   # TODO: This is custom addition. check if causes problems
-            #('nameserver', 'account'),    # TODO: check what account really is
-        )
+        #unique_together = (
+        #    ('ip', 'nameserver'),   # This is custom addition. check if causes problems
+        #    #('nameserver', 'account'),    # TODO: check what account really is. maybe we need to add a created_by field here.
+        #)
 
     def __unicode__(self):
         return self.nameserver
