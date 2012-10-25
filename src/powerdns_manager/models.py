@@ -60,8 +60,8 @@ class Domain(models.Model):
     
     class Meta:
         db_table = 'domains'
-        verbose_name = _('domain')
-        verbose_name_plural = _('domains')
+        verbose_name = _('zone')
+        verbose_name_plural = _('zones')
         get_latest_by = 'date_modified'
         ordering = ['name']
 
