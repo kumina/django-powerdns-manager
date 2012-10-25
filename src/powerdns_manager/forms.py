@@ -222,3 +222,12 @@ class GenericRecordModelForm(forms.ModelForm):
         return super(GenericRecordModelForm, self).save(*args, **kwargs)
 
 
+
+class ZoneImportForm(forms.Form):
+    """This form is used to import zone files through the ``import_zone_view``.
+    
+    """
+    origin = forms.CharField(max_length=128, initial='', required=False, label=_('Origin'), help_text="""Enter the origin, otherwise make sure $ORIGIN is set in your zone file. (optional)""")
+    zonetext = forms.CharField(widget=forms.Textarea, initial='', required=True, label=_('Zone file'), help_text="""Paste the zone file text. (required)""")
+    overwrite = forms.BooleanField(required=False, label=_('Overwrite'), help_text="""If checked, existing zone will be replaced by this one. Proceed with caution.""")
+
