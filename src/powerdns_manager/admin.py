@@ -120,7 +120,7 @@ class GenericRecordInline(admin.TabularInline):
     verbose_name_plural = 'Other Resource Records'
     
     def queryset(self, request):
-        """Exclude resource records which are editable in an Inline"""
+        """Exclude resource records which are editable in a separate Inline"""
         qs = super(GenericRecordInline, self).queryset(request)
         qs = qs.exclude(type='SOA')
         qs = qs.exclude(type='NS')
