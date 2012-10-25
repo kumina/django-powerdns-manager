@@ -32,17 +32,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 from powerdns_manager.forms import SoaRecordModelForm
-from powerdns_manager.forms import SoaRecordInlineModelFormset
-
+from powerdns_manager.forms import NsRecordModelForm
+from powerdns_manager.forms import MxRecordModelForm
+from powerdns_manager.forms import SrvRecordModelForm
 from powerdns_manager.forms import GenericRecordModelForm
-from powerdns_manager.forms import GenericRecordInlineModelFormset
-
-from powerdns_manager.forms import NsRecordInlineModelFormset
-
-from powerdns_manager.forms import MxRecordInlineModelFormset
-
-from powerdns_manager.forms import SrvRecordInlineModelFormset
-
 
 # Action for
 # - set change date
@@ -57,7 +50,6 @@ from powerdns_manager.forms import SrvRecordInlineModelFormset
 class SoaRecordInline(admin.StackedInline):
     model = cache.get_model('powerdns_manager', 'Record')
     form = SoaRecordModelForm
-    formset = SoaRecordInlineModelFormset
     # Show exactly one form
     extra = 1
     max_num = 1
@@ -75,8 +67,7 @@ class SoaRecordInline(admin.StackedInline):
 
 class NsRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
-    #form = 
-    formset = NsRecordInlineModelFormset
+    form = NsRecordModelForm
     extra = 0
     verbose_name = 'NS Resource Record'
     verbose_name_plural = 'NS Resource Records'
@@ -91,8 +82,7 @@ class NsRecordInline(admin.TabularInline):
 
 class MxRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
-    #form = 
-    formset = MxRecordInlineModelFormset
+    form = MxRecordModelForm
     extra = 0
     verbose_name = 'MX Resource Record'
     verbose_name_plural = 'MX Resource Records'
@@ -107,8 +97,7 @@ class MxRecordInline(admin.TabularInline):
 
 class SrvRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
-    #form = 
-    formset = SrvRecordInlineModelFormset
+    form = SrvRecordModelForm
     extra = 0
     verbose_name = 'SRV Resource Record'
     verbose_name_plural = 'SRV Resource Records'
@@ -124,12 +113,11 @@ class SrvRecordInline(admin.TabularInline):
 class GenericRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     form = GenericRecordModelForm
-    formset = GenericRecordInlineModelFormset
     fields = ('name', 'type_avail', 'ttl', 'content', 'auth', 'date_modified')
     readonly_fields = ('date_modified', )
-    extra = 3
-    verbose_name = 'Resource Record'
-    verbose_name_plural = 'Resource Records' # Only one SOA RR per zone
+    extra = 0
+    verbose_name = 'Other Resource Record'
+    verbose_name_plural = 'Other Resource Records'
     
     def queryset(self, request):
         """Exclude resource records which are editable in an Inline"""
@@ -177,6 +165,7 @@ class DomainAdmin(admin.ModelAdmin):
     ]
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
+    save_on_top = True
     
     def queryset(self, request):
         qs = super(DomainAdmin, self).queryset(request)
