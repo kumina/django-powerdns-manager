@@ -28,7 +28,6 @@ import time
 
 from django import forms
 from django.forms.models import BaseInlineFormSet
-from django.forms.models import modelformset_factory
 from django.db.models.loading import cache
 from django.utils.translation import ugettext_lazy as _
 
@@ -103,9 +102,10 @@ class SoaRecordModelForm(forms.ModelForm):
         if hostmaster.find('@') != -1:
             raise forms.ValidationError("""This should be specified in the mailbox-as-domain-name format where the `@' character is replaced with a dot. Example: hostmaster.domain.tld represents hostmaster@domain.tld""")
         return hostmaster
-    
 
-class SoaRecordInlineFormset(BaseInlineFormSet):
+
+
+class SoaRecordInlineModelFormset(BaseInlineFormSet):
     """Inline formset for SOA resource records.
     
     Here we set the prefix ``soa`` for the formset that contain SOA records.
@@ -116,12 +116,174 @@ class SoaRecordInlineFormset(BaseInlineFormSet):
     the SOA resource record of the zone.
     
     """
-    def __init__(self, *args, **kwargs):
-        kwargs['prefix'] = 'soa'
-        super(SoaRecordInlineFormset, self).__init__(*args, **kwargs)
+    model = cache.get_model('powerdns_manager', 'Record')
+    
+#    @classmethod
+#    def get_default_prefix(cls):
+#        default_prefix = super(SoaRecordInlineModelFormset, cls).get_default_prefix()
+#        return 'soa-%s' % default_prefix
+
+#    def get_queryset(self):
+#        """Return only SOA records"""
+#        qs = super(SoaRecordInlineModelFormset, self).get_queryset()
+#        return qs.filter(type='SOA')
+
+    def save(self, commit=True):
+        """
+        Logic taken from the ModelAdmin.save_formset() method.
+        """
+        # Process only SOA records
+        # Construct the instance.content field of the SOA resource record
         
-SoaRecordInlineModelFormset = modelformset_factory(
-    cache.get_model('powerdns_manager', 'Record'), form=SoaRecordModelForm, formset=SoaRecordInlineFormset)
+        instances = super(SoaRecordInlineModelFormset, self).save(commit=False)
+
+        for soa_form in self.forms:
+            soa_form.instance.type = 'SOA'
+            # TODO: Check which other fields need to be set here. auth, ordername, change_date
+            soa_form.instance.content = '%s %s %d %s %s %s %s' % (
+                soa_form.cleaned_data.get('primary'),
+                soa_form.cleaned_data.get('hostmaster'),
+                int(time.time()),
+                soa_form.cleaned_data.get('refresh'),
+                soa_form.cleaned_data.get('retry'),
+                soa_form.cleaned_data.get('expire'),
+                soa_form.cleaned_data.get('default_ttl')
+            )
+            soa_form.instance.save()
+        self.save_m2m()
+        #return super(SoaRecordInlineModelFormset, self).save(commit=True)
+    
 
 
+########################################
+
+
+class GenericRecordModelForm(forms.ModelForm):
+    """Generic ModelForm for resource records.
+    
+    This special ModelForm exists for the following reasons:
+    
+    1) To manipulate the available types by excluding those RR types for
+    which a special ModelForm exists.
+    
+    """
+    # For now we copy the types from the Record model and comment out those,
+    # for which a special ModelForm exists. Lame, but that's how it is.
+    # TODO: create a modelform for each record type?
+    AVAILABLE_RECORD_TYPE_CHOICES = (
+        ('A', 'A'),
+        ('AAAA', 'AAAA'),
+        ('AFSDB', 'AFSDB'),
+        ('CERT', 'CERT'),
+        ('CNAME', 'CNAME'),
+        ('DNSKEY', 'DNSKEY'),
+        ('DS', 'DS'),
+        ('HINFO', 'HINFO'),
+        ('KEY', 'KEY'),
+        ('LOC', 'LOC'),
+        #('MX', 'MX'),
+        ('NAPTR', 'NAPTR'),
+        #('NS', 'NS'),
+        ('NSEC', 'NSEC'),
+        ('PTR', 'PTR'),
+        ('RP', 'RP'),
+        ('RRSIG', 'RRSIG'),
+        #('SOA', 'SOA'),
+        ('SPF', 'SPF'),
+        ('SSHFP', 'SSHFP'),
+        ('SRV', 'SRV'),
+        ('TXT', 'TXT'),
+    )
+    type_avail = forms.ChoiceField(initial='', required=True, choices=AVAILABLE_RECORD_TYPE_CHOICES, label=_('type'), help_text="""Select the resource record type.""")
+
+    class Meta:
+        model = cache.get_model('powerdns_manager', 'Record')
+
+    def __init__(self, *args, **kwargs):
+        """ModelForm constructor.
+
+        """
+        if kwargs.has_key('instance'):
+            instance = kwargs['instance']
+            if instance.pk is not None:    # This check asserts that this is an EDIT
+                kwargs['initial'] = {
+                    'type_avail': instance.type,
+                }
+        super(GenericRecordModelForm, self).__init__(*args, **kwargs)
+
+
+class GenericRecordInlineModelFormset(BaseInlineFormSet):
+    """Generic Inline formset for resource records."""
+    model = cache.get_model('powerdns_manager', 'Record')
+    
+    def save(self, commit=True):
+        """
+        Logic taken from the ModelAdmin.save_formset() method.
+        """
+        # Process only SOA records
+        # Construct the instance.content field of the SOA resource record
+        
+        instances = super(GenericRecordInlineModelFormset, self).save(commit=False)
+
+        for rr_form in self.forms:
+            if rr_form.instance.name and rr_form.instance.content:
+                rr_form.instance.type = rr_form.cleaned_data.get('type_avail')
+                # TODO: Check which other fields need to be set here. auth, ordername, change_date
+                rr_form.instance.save()
+        self.save_m2m()
+
+
+
+######################################
+
+class NsRecordInlineModelFormset(BaseInlineFormSet):
+    """Generic Inline formset for NS resource records."""
+    model = cache.get_model('powerdns_manager', 'Record')
+    
+    def save(self, commit=True):
+        """
+        Logic taken from the ModelAdmin.save_formset() method.
+        """
+        # Process only NS records
+        instances = super(NsRecordInlineModelFormset, self).save(commit=False)
+
+        for ns_form in self.forms:
+            ns_form.instance.type = 'NS'
+            # TODO: Check which other fields need to be set here. auth, ordername, change_date
+            ns_form.instance.save()
+        self.save_m2m()
+
+
+#######################################
+
+class MxRecordInlineModelFormset(BaseInlineFormSet):
+    """Generic Inline formset for MX resource records."""
+    model = cache.get_model('powerdns_manager', 'Record')
+    
+    def save(self, commit=True):
+        # Process only MX records
+        instances = super(MxRecordInlineModelFormset, self).save(commit=False)
+
+        for mx_form in self.forms:
+            mx_form.instance.type = 'MX'
+            # TODO: Check which other fields need to be set here. auth, ordername, change_date
+            mx_form.instance.save()
+        self.save_m2m()
+
+
+#######################################
+
+class SrvRecordInlineModelFormset(BaseInlineFormSet):
+    """Generic Inline formset for SRV resource records."""
+    model = cache.get_model('powerdns_manager', 'Record')
+    
+    def save(self, commit=True):
+        # Process only SRV records
+        instances = super(SrvRecordInlineModelFormset, self).save(commit=False)
+
+        for srv_form in self.forms:
+            srv_form.instance.type = 'SRV'
+            # TODO: Check which other fields need to be set here. auth, ordername, change_date
+            srv_form.instance.save()
+        self.save_m2m()
 

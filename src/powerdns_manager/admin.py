@@ -36,6 +36,15 @@ from django.utils.translation import ugettext_lazy as _
 from powerdns_manager.forms import SoaRecordModelForm
 from powerdns_manager.forms import SoaRecordInlineModelFormset
 
+from powerdns_manager.forms import GenericRecordModelForm
+from powerdns_manager.forms import GenericRecordInlineModelFormset
+
+from powerdns_manager.forms import NsRecordInlineModelFormset
+
+from powerdns_manager.forms import MxRecordInlineModelFormset
+
+from powerdns_manager.forms import SrvRecordInlineModelFormset
+
 
 # Action for
 # - set change date
@@ -65,9 +74,65 @@ class SoaRecordInline(admin.StackedInline):
         return qs.filter(type='SOA')
 
 
-class RecordInline(admin.TabularInline):
+class NsRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
-    fields = ('name', 'type', 'ttl', 'prio', 'content', 'auth', 'date_modified')
+    #form = 
+    formset = NsRecordInlineModelFormset
+    # Show exactly one form
+    extra = 0
+    #max_num = 1
+    verbose_name = 'NS Resource Record'
+    verbose_name_plural = 'NS Resource Records'
+    fields = ('name', 'ttl', 'content', 'auth', 'date_modified')
+    readonly_fields = ('date_modified', )
+    
+    def queryset(self, request):
+        """Return only NS records"""
+        qs = super(NsRecordInline, self).queryset(request)
+        return qs.filter(type='NS')
+
+
+class MxRecordInline(admin.TabularInline):
+    model = cache.get_model('powerdns_manager', 'Record')
+    #form = 
+    formset = MxRecordInlineModelFormset
+    # Show exactly one form
+    extra = 0
+    #max_num = 1
+    verbose_name = 'MX Resource Record'
+    verbose_name_plural = 'MX Resource Records'
+    fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
+    readonly_fields = ('date_modified', )
+    
+    def queryset(self, request):
+        """Return only MX records"""
+        qs = super(MxRecordInline, self).queryset(request)
+        return qs.filter(type='MX')
+    
+
+class SrvRecordInline(admin.TabularInline):
+    model = cache.get_model('powerdns_manager', 'Record')
+    #form = 
+    formset = SrvRecordInlineModelFormset
+    # Show exactly one form
+    extra = 0
+    #max_num = 1
+    verbose_name = 'SRV Resource Record'
+    verbose_name_plural = 'SRV Resource Records'
+    fields = ('name', 'ttl', 'prio', 'content', 'auth', 'date_modified')
+    readonly_fields = ('date_modified', )
+    
+    def queryset(self, request):
+        """Return only SRV records"""
+        qs = super(SrvRecordInline, self).queryset(request)
+        return qs.filter(type='SRV')
+
+
+class GenericRecordInline(admin.TabularInline):
+    model = cache.get_model('powerdns_manager', 'Record')
+    form = GenericRecordModelForm
+    formset = GenericRecordInlineModelFormset
+    fields = ('name', 'type_avail', 'ttl', 'content', 'auth', 'date_modified')
     readonly_fields = ('date_modified', )
     extra = 3
     verbose_name = 'Resource Record'
@@ -75,7 +140,7 @@ class RecordInline(admin.TabularInline):
     
     def queryset(self, request):
         """Exclude SOA records"""
-        qs = super(RecordInline, self).queryset(request)
+        qs = super(GenericRecordInline, self).queryset(request)
         return qs.exclude(type='SOA')
 
 class DomainMetadataInline(admin.TabularInline):
@@ -102,7 +167,15 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'master', 'date_modified')
     list_filter = ('type', )
     search_fields = ('name', 'master')
-    inlines = [SoaRecordInline, RecordInline, DomainMetadataInline, CryptoKeyInline]
+    inlines = [
+        SoaRecordInline,
+        NsRecordInline,
+        MxRecordInline,
+        SrvRecordInline,
+        GenericRecordInline,
+        DomainMetadataInline,
+        CryptoKeyInline
+    ]
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     
@@ -118,29 +191,31 @@ class DomainAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.save()
     
-    def save_formset(self, request, form, formset, change):
-        """Set the ``created_by`` attribute each time an image attachment
-        or ticket is created.
-        
-        """
-        # Process only SOA records
-        # Construct the instance.content field of the SOA resource record
-        if formset.prefix.startswith('soa'):
-            instances = formset.save(commit=False)
-            for soa_form in formset.forms:
-                soa_form.instance.content = '%s %s %d %s %s %s %s' % (
-                    soa_form.cleaned_data.get('primary'),
-                    soa_form.cleaned_data.get('hostmaster'),
-                    int(time.time()),
-                    soa_form.cleaned_data.get('refresh'),
-                    soa_form.cleaned_data.get('retry'),
-                    soa_form.cleaned_data.get('expire'),
-                    soa_form.cleaned_data.get('default_ttl')
-                )
-                soa_form.instance.save()
-            formset.save_m2m()
-        else:
-            super(DomainAdmin, self).save_formset(request, form, formset, change)
+#    def save_formset(self, request, form, formset, change):
+#        """Set the ``created_by`` attribute each time an image attachment
+#        or ticket is created.
+#        
+#        """
+#        # Process only SOA records
+#        # Construct the instance.content field of the SOA resource record
+#        if formset.prefix.startswith('soa'):
+#            instances = formset.save(commit=False)
+#            for soa_form in formset.forms:
+#                soa_form.instance.type = 'SOA'
+#                # TODO: Check which other fields need to be set here. auth, ordername, change_date
+#                soa_form.instance.content = '%s %s %d %s %s %s %s' % (
+#                    soa_form.cleaned_data.get('primary'),
+#                    soa_form.cleaned_data.get('hostmaster'),
+#                    int(time.time()),
+#                    soa_form.cleaned_data.get('refresh'),
+#                    soa_form.cleaned_data.get('retry'),
+#                    soa_form.cleaned_data.get('expire'),
+#                    soa_form.cleaned_data.get('default_ttl')
+#                )
+#                soa_form.instance.save()
+#            formset.save_m2m()
+#        else:
+#            super(DomainAdmin, self).save_formset(request, form, formset, change)
 
 admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
