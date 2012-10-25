@@ -68,8 +68,6 @@ class Domain(models.Model):
     def __unicode__(self):
         return self.name
 
-#name convert to lowercase
-
 
 
 class Record(models.Model):
@@ -138,6 +136,7 @@ class Record(models.Model):
 
 # change_date This should be set on every save  manually
 # should be set automatically on every save
+# fill TTL if missing
 
 
 class SuperMaster(models.Model):
@@ -159,7 +158,7 @@ class SuperMaster(models.Model):
 
     """
     ip = models.GenericIPAddressField(verbose_name=_('IP address'), help_text="""IP address for supermaster (IPv4 or IPv6).""")
-    # TODO: added unique - check
+    # TODO: added unique --- check if OK
     nameserver = models.CharField(max_length=255, unique=True, verbose_name=_('nameserver'), help_text="""Hostname of the supermaster.""")
     account = models.CharField(max_length=40, blank=True, null=True, verbose_name=_('account'), help_text="""Account name (???)""")
 
@@ -173,7 +172,7 @@ class SuperMaster(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['nameserver']
         unique_together = (
-            ('ip', 'nameserver'),   # This is custom addition. check if causes problems
+            ('ip', 'nameserver'),   # TODO: This is custom addition. check if causes problems
             #('nameserver', 'account'),    # TODO: check what account really is
         )
 
