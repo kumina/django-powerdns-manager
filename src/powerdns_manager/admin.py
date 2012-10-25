@@ -191,32 +191,6 @@ class DomainAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.save()
     
-#    def save_formset(self, request, form, formset, change):
-#        """Set the ``created_by`` attribute each time an image attachment
-#        or ticket is created.
-#        
-#        """
-#        # Process only SOA records
-#        # Construct the instance.content field of the SOA resource record
-#        if formset.prefix.startswith('soa'):
-#            instances = formset.save(commit=False)
-#            for soa_form in formset.forms:
-#                soa_form.instance.type = 'SOA'
-#                # TODO: Check which other fields need to be set here. auth, ordername, change_date
-#                soa_form.instance.content = '%s %s %d %s %s %s %s' % (
-#                    soa_form.cleaned_data.get('primary'),
-#                    soa_form.cleaned_data.get('hostmaster'),
-#                    int(time.time()),
-#                    soa_form.cleaned_data.get('refresh'),
-#                    soa_form.cleaned_data.get('retry'),
-#                    soa_form.cleaned_data.get('expire'),
-#                    soa_form.cleaned_data.get('default_ttl')
-#                )
-#                soa_form.instance.save()
-#            formset.save_m2m()
-#        else:
-#            super(DomainAdmin, self).save_formset(request, form, formset, change)
-
 admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
 
