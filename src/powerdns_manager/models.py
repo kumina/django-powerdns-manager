@@ -29,6 +29,7 @@ from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 
 from powerdns_manager import settings
+from powerdns_manager import signal_cb
 
 
 """
@@ -116,7 +117,8 @@ class Record(models.Model):
     # Extra fields for DNSSEC (http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database)
     auth = models.NullBooleanField(default=True, verbose_name=_('authoritative'), help_text="""The 'auth' field should be set to '1' for data for which the zone itself is authoritative, which includes the SOA record and its own NS records. The 'auth' field should be 0 however for NS records which are used for delegation, and also for any glue (A, AAAA) records present for this purpose. Do note that the DS record for a secure delegation should be authoritative!""")
     ordername = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_('ordername'), help_text="""http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database""")
-    # This should be set on every save  manually
+    
+    # This is set to the current timestamp on every save
     change_date = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('change date'), help_text="""Timestamp for the last update. This is used by PowerDNS internally.""")
 
     # PowerDNS Manager internal fields
@@ -135,9 +137,11 @@ class Record(models.Model):
         #return '%s %s' % (self.type, self.name)
         return self.name
 
-# change_date This should be set on every save  manually
-# should be set automatically on every save
-# fill TTL if missing
+# Update ``change_date``
+signals.pre_save.connect(signal_cb.update_rr_change_date, sender=Record)
+# Set missing TTL information
+signals.pre_save.connect(signal_cb.set_missing_ttl, sender=Record)
+
 
 
 class SuperMaster(models.Model):
