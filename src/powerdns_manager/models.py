@@ -130,7 +130,6 @@ class Record(models.Model):
         verbose_name_plural = _('records')
         get_latest_by = 'date_modified'
         ordering = ['type']
-        order_with_respect_to = 'domain'
         # TODO: Missing: CREATE INDEX nametype_index ON records(name,type);
         # SEE: http://stackoverflow.com/questions/1578195/django-create-index-non-unique-multiple-column
         
@@ -211,7 +210,6 @@ class DomainMetadata(models.Model):
         verbose_name_plural = _('domain metadata')
         get_latest_by = 'date_modified'
         ordering = ['kind']
-        order_with_respect_to = 'domain'
         
     def __unicode__(self):
         return self.kind
