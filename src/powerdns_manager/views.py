@@ -23,3 +23,63 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponse
+from django.db.models.loading import cache
+
+from powerdns_manager.forms import ZoneImportForm
+from powerdns_manager.utils import process_zone_file
+
+
+@login_required
+@csrf_protect
+def import_zone_view(request):
+    if request.method == 'POST': # If the form has been submitted...
+        form = ZoneImportForm(request.POST) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            # Process the data in form.cleaned_data
+            origin = form.cleaned_data['origin']
+            zonetext = form.cleaned_data['zonetext']
+            overwrite = form.cleaned_data['overwrite']
+            
+            # Check if exists
+            Domain = cache.get_model('powerdns_manager', 'Domain')
+            try:
+                domain_instance = Domain.objects.get(name=origin)
+            except Domain.DoesNotExist:
+                pass
+            else:
+                if overwrite:
+                    # If ``overwrite`` has been checked, then delete the current zone.
+                    domain_instance.delete()
+                else:
+                    return HttpResponse('<h1>Error</h1><p>Zone already exists</p>', content_type="text/html")
+            
+            process_zone_file(origin, zonetext)
+            return HttpResponse('<h1>Success</h1>', content_type="text/html")
+            
+    else:
+        form = ZoneImportForm() # An unbound form
+
+    info_dict = {
+        'form': form,
+    }
+    return render_to_response(
+        'powerdns_manager/import_zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+    
+
+
+
+
+    
+    
+    
+    
+    
+    
