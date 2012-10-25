@@ -27,7 +27,6 @@
 import time
 
 from django import forms
-from django.forms.models import BaseInlineFormSet
 from django.db.models.loading import cache
 from django.utils.translation import ugettext_lazy as _
 
