@@ -132,6 +132,7 @@ class Record(models.Model):
         # SEE: http://stackoverflow.com/questions/1578195/django-create-index-non-unique-multiple-column
         
     def __unicode__(self):
+        #return '%s %s' % (self.type, self.name)
         return self.name
 
 # change_date This should be set on every save  manually
