@@ -1,3 +1,4 @@
 django-powerdns-manager
 Django
 Sphinx
+dnspython
