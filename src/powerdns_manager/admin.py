@@ -139,9 +139,13 @@ class GenericRecordInline(admin.TabularInline):
     verbose_name_plural = 'Resource Records' # Only one SOA RR per zone
     
     def queryset(self, request):
-        """Exclude SOA records"""
+        """Exclude resource records which are editable in an Inline"""
         qs = super(GenericRecordInline, self).queryset(request)
-        return qs.exclude(type='SOA')
+        qs = qs.exclude(type='SOA')
+        qs = qs.exclude(type='NS')
+        qs = qs.exclude(type='MX')
+        qs = qs.exclude(type='SRV')
+        return qs
 
 class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
