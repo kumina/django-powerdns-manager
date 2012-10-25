@@ -24,8 +24,6 @@
 #  limitations under the License.
 #
 
-import time
-
 from django.contrib import admin
 from django.db.models.loading import cache
 from django.contrib import messages
