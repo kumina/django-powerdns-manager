@@ -32,6 +32,20 @@ from powerdns_manager import settings
 
 
 
+def set_soa_rr_name(sender, **kwargs):
+    """Sets the ``name`` field of the SOA record.
+    
+    PowerDNS Manager allows only one SOA RR per zone.
+    
+    This callback updates the ``name`` field of the SOA record and
+    sats it eual to the name of the associated domain.
+    
+    """
+    instance = kwargs['instance']   # powerdns_manager.Record instance
+    if instance.type == 'SOA':
+        instance.name = instance.domain.name
+
+
 def update_rr_change_date(sender, **kwargs):
     instance = kwargs['instance']   # powerdns_manager.Record instance
     instance.change_date = int(time.time())

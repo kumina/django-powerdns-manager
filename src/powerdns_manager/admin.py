@@ -55,7 +55,9 @@ class SoaRecordInline(admin.StackedInline):
     max_num = 1
     verbose_name = 'SOA Resource Record'
     verbose_name_plural = 'SOA Resource Record' # Only one SOA RR per zone
-    fields = ('name', 'ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl', 'date_modified')
+    # The ``name`` field is not available for editing. It is always set to the
+    # name of the domain in ``signal_cb.theset_soa_rr_name()`` callback.
+    fields = ('ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl', 'date_modified')
     readonly_fields = ('date_modified', )
     can_delete = False
     
