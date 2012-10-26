@@ -49,27 +49,11 @@ def import_zone_view(request):
             zonetext = form.cleaned_data['zonetext']
             overwrite = form.cleaned_data['overwrite']
             
-            # Check if exists
-            Domain = cache.get_model('powerdns_manager', 'Domain')
             try:
-                domain_instance = Domain.objects.get(name=origin)
-            except Domain.DoesNotExist:
-                pass
-            else:
-                if overwrite:
-                    # If ``overwrite`` has been checked, then delete the current zone.
-                    domain_instance.delete()
-                else:
-                    info_dict = {
-                        'strerror': mark_safe('Zone already exists. If you wish to replace it with the imported one, check the <em>Overwrite</em> option in the import form.'),
-                    }
-                    return render_to_response('powerdns_manager/import/error.html', info_dict, mimetype='text/html')
-            
-            try:
-                process_zone_file(origin, zonetext)
+                process_zone_file(origin, zonetext, overwrite)
             except Exception, e:
                 info_dict = {
-                    'strerror': str(e),
+                    'strerror': mark_safe(str(e)),
                 }
                 return render_to_response('powerdns_manager/import/error.html', info_dict, mimetype='text/html')
             #return HttpResponse('<h1>Success</h1>', content_type="text/html")

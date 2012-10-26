@@ -36,7 +36,7 @@ from django.db.models.loading import cache
 
 
 
-def process_zone_file(origin, zonetext):
+def process_zone_file(origin, zonetext, overwrite=False):
     """Imports zone to the database.
     
     No checks for existence are performed in this file. For form processing,
@@ -45,8 +45,7 @@ def process_zone_file(origin, zonetext):
     *****
     Special kudos to Grig Gheorghiu for demonstrating how to manage zone files
     using dnspython in the following article:
-    
-        http://agiletesting.blogspot.com/2005/08/managing-dns-zone-files-with-dnspython.html
+    http://agiletesting.blogspot.com/2005/08/managing-dns-zone-files-with-dnspython.html
     *****
     
     """
@@ -62,6 +61,22 @@ def process_zone_file(origin, zonetext):
         zone = dns.zone.from_text(zonetext, origin=origin, relativize=False)
         if not str(zone.origin).rstrip('.'):
             raise UnknownOrigin
+        
+        # New zone data is now available
+        
+        # Check if zone already exists in the database.
+        try:
+            domain_instance = Domain.objects.get(name=origin)
+        except Domain.DoesNotExist:
+            pass    # proceed with importing the new zone data
+        else:   # Zone exists
+            if overwrite:
+                # If ``overwrite`` has been checked, then delete the current zone.
+                domain_instance.delete()
+            else:
+                raise Exception('Zone already exists. If you wish to replace it with the imported one, check the <em>Overwrite</em> option in the import form.')
+        
+        # Import the new zone data to the database.
         
         # Create a domain instance
         the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE')
