@@ -32,7 +32,13 @@ from django.utils.translation import ugettext_lazy as _
 
 
 
-class SoaRecordModelForm(forms.ModelForm):
+class BaseRecordModelForm(forms.ModelForm):
+    """Base ModelForm for Record instances.
+    
+    """
+
+
+class SoaRecordModelForm(BaseRecordModelForm):
     """ModelForm for SOA resource records.
     
     By default, PowerDNS expects the content of the SOA records to contain the
@@ -161,7 +167,7 @@ class SoaRecordModelForm(forms.ModelForm):
 #        return 'soa-%s' % default_prefix
 
 
-class NsRecordModelForm(forms.ModelForm):
+class NsRecordModelForm(BaseRecordModelForm):
     """ModelForm for NS resource records."""
 
     class Meta:
@@ -172,7 +178,7 @@ class NsRecordModelForm(forms.ModelForm):
         return super(NsRecordModelForm, self).save(*args, **kwargs)
 
     
-class MxRecordModelForm(forms.ModelForm):
+class MxRecordModelForm(BaseRecordModelForm):
     """ModelForm for MX resource records."""
 
     class Meta:
@@ -183,7 +189,7 @@ class MxRecordModelForm(forms.ModelForm):
         return super(MxRecordModelForm, self).save(*args, **kwargs)
 
 
-class SrvRecordModelForm(forms.ModelForm):
+class SrvRecordModelForm(BaseRecordModelForm):
     """ModelForm for SRV resource records."""
 
     class Meta:
@@ -195,7 +201,7 @@ class SrvRecordModelForm(forms.ModelForm):
     
     
 
-class GenericRecordModelForm(forms.ModelForm):
+class GenericRecordModelForm(BaseRecordModelForm):
     """Generic ModelForm for resource records.
     
     This special ModelForm manipulates the available RR types by excluding
