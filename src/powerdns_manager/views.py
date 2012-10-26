@@ -56,7 +56,6 @@ def import_zone_view(request):
                     'strerror': mark_safe(str(e)),
                 }
                 return render_to_response('powerdns_manager/import/error.html', info_dict, mimetype='text/html')
-            #return HttpResponse('<h1>Success</h1>', content_type="text/html")
             return render_to_response('powerdns_manager/import/success.html', {}, mimetype='text/html')
             
     else:
