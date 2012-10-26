@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; {% trans 'Import zone file' %}
+    </div>
+{% endblock %}
+
+{% block title %}{% trans 'Zone import successful' %}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans 'Zone import successful' %}</h1>
+
+<p>{% trans 'The zone file has been imported successfully. Import ' %}<a href="{% url 'import_zone' %}">{% trans 'another zone' %}</a>.</p>
+
+{% endblock %}

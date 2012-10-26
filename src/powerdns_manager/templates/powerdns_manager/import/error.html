@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; {% trans 'Import zone file' %}
+    </div>
+{% endblock %}
+
+{% block title %}{% trans 'Error' %}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans 'Error' %}</h1>
+
+<p><span style="color: red;">{{ strerror }}</span></p>
+
+<p>{% trans "Please use your browser\'s <em>Back</em> button to return to the zone import form." %}</p>
+
+{% endblock %}
