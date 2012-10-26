@@ -24,6 +24,8 @@
 #  limitations under the License.
 #
 
+import time
+
 from django.db import models
 from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
@@ -154,19 +156,35 @@ class Record(models.Model):
     def __unicode__(self):
         #return '%s %s' % (self.type, self.name)
         return self.name
-
-# Signals are always executed in bulk operations, so they are preferred.
-
-# Set the ``name`` field on SOA records.
-signals.pre_save.connect(signal_cb.set_soa_rr_name, sender=Record)
-# Update ``change_date``
-signals.pre_save.connect(signal_cb.update_rr_change_date, sender=Record)
-# Set TTL information for the record
-signals.pre_save.connect(signal_cb.set_rr_ttl, sender=Record)
-# Set ``auth`` field
-signals.pre_save.connect(signal_cb.set_rr_authoritative, sender=Record)
-# Set ``ordername`` field
-signals.pre_save.connect(signal_cb.set_rr_ordername, sender=Record)
+    
+    def save(self, *args, **kwargs):
+        """Saves the instance to the database.
+        
+        The following actions are performed:
+        
+        1) Sets the current timestamp to the ``change_date`` field. This is
+        used by PowerDNS.
+        
+        2) Sets the TTL of the resource record(s), if missing. Since
+        ``get_minimum_ttl()`` retrieves the minimum TTL from the SOA record,
+        if a SOA record has not been saved yet, then PDNS_DEFAULT_RR_TTL will
+        be used instead.
+        
+        3) Set the ``auth`` field. Needed by PowerDNS internals.
+        
+        4) Set the ``ordername`` field. Needed by PowerDNS internals.
+        
+        """
+        self.change_date = int(time.time())
+        
+        if not self.ttl:
+            self.ttl = self.domain.get_minimum_ttl()
+        
+        # TODO: set auth
+        
+        # TODO: set ordername
+        
+        return super(Record, self).save(*args, **kwargs)
 
 
 
