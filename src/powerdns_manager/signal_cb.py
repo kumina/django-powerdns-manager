@@ -61,9 +61,10 @@ def set_rr_ttl(sender, **kwargs):
     
     This is done according to the following rules:
     
-    1) TTL of SOA RRs is not modified. The TTL field is mandatory on SOA
-    records (see forms.SoaRecordModelForm) and also defines the minimum TTL
-    get_minimum_ttl() retrieves.
+    1) TTL of SOA RRs is not modified here. Missing TTL information is handled
+    in forms.SoaRecordModelForm.save() method. The minimum TTL is retrieved
+    from the SOA content field, so it would make no sense to set it in this
+    callback.
     
     2) If the RR is not a SOA and if TTL is missing, the minimum TTL of
     the zone (as defined in the SOA record) will be used. If a SOA record

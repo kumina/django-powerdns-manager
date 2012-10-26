@@ -54,6 +54,9 @@ class SoaRecordModelForm(forms.ModelForm):
     are concatenated in save() to form the SOA RR content that PowerDNS expects
     to find stored in the database.
     
+    Also, if TTl information is missing, then the default TTL (mandatory field)
+    is used.
+    
     """
     primary = forms.CharField(max_length=96, initial='', required=True, label=_('primary nameserver'), help_text="""The name of the name server that was the original or primary source of data for this zone.""")
     hostmaster = forms.CharField(max_length=64, initial='', required=True, label=_('hostmaster mailbox'), help_text="""A name which specifies the mailbox of the person responsible for this zone. This should be specified in the mailbox-as-domain-name format where the `@' character is replaced with a dot. Example: hostmaster.domain.tld represents hostmaster@domain.tld""")
@@ -101,7 +104,6 @@ class SoaRecordModelForm(forms.ModelForm):
     
     def save(self, *args, **kwargs):
         self.instance.type = 'SOA'
-        # TODO: Check which other fields need to be set here. auth, ordername, change_date
         self.instance.content = '%s %s %d %s %s %s %s' % (
             self.cleaned_data.get('primary'),
             self.cleaned_data.get('hostmaster'),
@@ -111,6 +113,8 @@ class SoaRecordModelForm(forms.ModelForm):
             self.cleaned_data.get('expire'),
             self.cleaned_data.get('default_ttl')
         )
+        if not self.instance.ttl:
+            self.instance.ttl = self.cleaned_data.get('default_ttl')
         return super(SoaRecordModelForm, self).save(*args, **kwargs)
         
 
