@@ -56,10 +56,23 @@ def update_rr_change_date(sender, **kwargs):
     instance.change_date = int(time.time())
 
 
-def set_missing_rr_ttl(sender, **kwargs):
+def set_rr_ttl(sender, **kwargs):
+    """Sets the TTL of the resource record(s).
+    
+    This is done according to the following rules:
+    
+    1) TTL of SOA RRs is not modified. The TTL field is mandatory on SOA
+    records (see forms.SoaRecordModelForm) and also defines the minimum TTL
+    get_minimum_ttl() retrieves.
+    
+    2) If the RR is not a SOA and if TTL is missing, the minimum TTL of
+    the zone (as defined in the SOA record) will be used. If a SOA record
+    is missing, PDNS_DEFAULT_RR_TTL is returned by Domain.get.minimum_ttl().
+    
+    """
     instance = kwargs['instance']   # powerdns_manager.Record instance
-    instance.ttl = settings.PDNS_DEFAULT_RR_TTL
-    # TODO: consider checking the minimum TTL from the SOA record.
+    if not instance.ttl and instance.type != 'SOA':
+        instance.ttl = instance.domain.get_minimum_ttl()
 
 
 def set_rr_authoritative(sender, **kwargs):

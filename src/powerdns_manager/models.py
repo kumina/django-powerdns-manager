@@ -130,7 +130,7 @@ class Record(models.Model):
     # See section 8.5 about why the type field allows NULL. (PowerDNS 3.2 and above)
     type = models.CharField(max_length=10, null=True, db_index=True, choices=RECORD_TYPE_CHOICES, verbose_name=_('type'), help_text="""Select the type of the resource record.""")
     content = models.CharField(max_length=255, null=True, verbose_name=_('content'), help_text="""This is the 'right hand side' of a DNS record. For an A record, this is the IP address for example.""")
-    ttl = models.PositiveIntegerField(max_length=11, null=True, default=settings.PDNS_DEFAULT_RR_TTL, verbose_name=_('TTL'), help_text="""How long the DNS-client are allowed to remember this record. Also known as Time To Live(TTL) This value is in seconds.""")
+    ttl = models.PositiveIntegerField(max_length=11, blank=True, null=True, verbose_name=_('TTL'), help_text="""How long the DNS-client are allowed to remember this record. Also known as Time To Live(TTL) This value is in seconds.""")
     prio = models.PositiveIntegerField(max_length=11, null=True, verbose_name=_('priority'), help_text="""For MX records, this should be the priority of the mail exchanger specified.""")
     # Extra fields for DNSSEC (http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database)
     auth = models.NullBooleanField(verbose_name=_('authoritative'), help_text="""The 'auth' field should be set to '1' for data for which the zone itself is authoritative, which includes the SOA record and its own NS records. The 'auth' field should be 0 however for NS records which are used for delegation, and also for any glue (A, AAAA) records present for this purpose. Do note that the DS record for a secure delegation should be authoritative!""")
@@ -161,8 +161,8 @@ class Record(models.Model):
 signals.pre_save.connect(signal_cb.set_soa_rr_name, sender=Record)
 # Update ``change_date``
 signals.pre_save.connect(signal_cb.update_rr_change_date, sender=Record)
-# Set missing TTL information
-signals.pre_save.connect(signal_cb.set_missing_rr_ttl, sender=Record)
+# Set TTL information for the record
+signals.pre_save.connect(signal_cb.set_rr_ttl, sender=Record)
 # Set ``auth`` field
 signals.pre_save.connect(signal_cb.set_rr_authoritative, sender=Record)
 # Set ``ordername`` field
