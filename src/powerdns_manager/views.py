@@ -32,6 +32,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from django.db.models.loading import cache
+from django.utils.html import mark_safe
 
 from powerdns_manager.forms import ZoneImportForm
 from powerdns_manager.utils import process_zone_file
@@ -59,7 +60,10 @@ def import_zone_view(request):
                     # If ``overwrite`` has been checked, then delete the current zone.
                     domain_instance.delete()
                 else:
-                    return HttpResponse('<h1>Error</h1><p>Zone already exists</p>', content_type="text/html")
+                    info_dict = {
+                        'strerror': mark_safe('Zone already exists. If you wish to replace it with the imported one, check the <em>Overwrite</em> option in the import form.'),
+                    }
+                    return render_to_response('powerdns_manager/import/error.html', info_dict, mimetype='text/html')
             
             try:
                 process_zone_file(origin, zonetext)
