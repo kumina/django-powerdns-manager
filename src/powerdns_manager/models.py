@@ -27,6 +27,7 @@
 from django.db import models
 from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.loading import cache
 
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
@@ -68,7 +69,23 @@ class Domain(models.Model):
 
     def __unicode__(self):
         return self.name
-
+    
+    def get_minimum_ttl(self):
+        """Returns the minimum TTL.
+        
+        The SOA record of the zone is retrieved and the minimum TTL is extracted
+        from the ``content`` field.
+        
+        If a SOA record does not exist for this zone, None is returned.
+        
+        """
+        Record = cache.get_model('powerdns_manager', 'Record')
+        try:
+            soa_rr = Record.objects.get(domain=self, type='SOA')
+        except Record.DoesNotExist:
+            return None
+        else:
+            return soa_rr.content.split()[-1]
 
 
 class Record(models.Model):
