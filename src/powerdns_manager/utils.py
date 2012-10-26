@@ -79,7 +79,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
         # Import the new zone data to the database.
         
         # Create a domain instance
-        the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE')
+        the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE', master='')
         
         # Create RRs
         for name, node in zone.nodes.items():
