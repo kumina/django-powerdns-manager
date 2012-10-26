@@ -83,14 +83,4 @@ def import_zone_view(request):
     }
     return render_to_response(
         'powerdns_manager/import/zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
-    
 
-
-
-
-    
-    
-    
-    
-    
-    
