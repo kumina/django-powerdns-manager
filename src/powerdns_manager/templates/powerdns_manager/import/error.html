@@ -12,11 +12,7 @@
 {% block title %}{% trans 'Error' %}{% endblock %}
 
 {% block content %}
-
-<h1>{% trans 'Error' %}</h1>
-
-<p><span style="color: red;">{{ strerror }}</span></p>
-
-<p>{% trans "Please use your browser\'s <em>Back</em> button to return to the zone import form." %}</p>
-
+	<h1>{% trans 'Error' %}</h1>
+	<p><span style="color: red;">{{ strerror }}</span></p>
+	<p>{% trans "Please use your browser\'s <em>Back</em> button to return to the zone import form." %}</p>
 {% endblock %}
