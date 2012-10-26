@@ -76,14 +76,15 @@ class Domain(models.Model):
         The SOA record of the zone is retrieved and the minimum TTL is extracted
         from the ``content`` field.
         
-        If a SOA record does not exist for this zone, None is returned.
+        If a SOA record does not exist for this zone, PDNS_DEFAULT_RR_TTL
+        is returned from the settings..
         
         """
         Record = cache.get_model('powerdns_manager', 'Record')
         try:
             soa_rr = Record.objects.get(domain=self, type='SOA')
         except Record.DoesNotExist:
-            return None
+            return settings.PDNS_DEFAULT_RR_TTL
         else:
             return soa_rr.content.split()[-1]
 
