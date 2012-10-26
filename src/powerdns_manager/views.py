@@ -61,8 +61,15 @@ def import_zone_view(request):
                 else:
                     return HttpResponse('<h1>Error</h1><p>Zone already exists</p>', content_type="text/html")
             
-            process_zone_file(origin, zonetext)
-            return HttpResponse('<h1>Success</h1>', content_type="text/html")
+            try:
+                process_zone_file(origin, zonetext)
+            except Exception, e:
+                info_dict = {
+                    'strerror': str(e),
+                }
+                return render_to_response('powerdns_manager/import/error.html', info_dict, mimetype='text/html')
+            #return HttpResponse('<h1>Success</h1>', content_type="text/html")
+            return render_to_response('powerdns_manager/import/success.html', {}, mimetype='text/html')
             
     else:
         form = ZoneImportForm() # An unbound form
@@ -71,7 +78,7 @@ def import_zone_view(request):
         'form': form,
     }
     return render_to_response(
-        'powerdns_manager/import_zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+        'powerdns_manager/import/zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
     
 
 
