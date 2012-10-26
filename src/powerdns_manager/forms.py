@@ -218,57 +218,149 @@ class SrvRecordModelForm(BaseRecordModelForm):
         self.instance.type = 'SRV'
         return super(SrvRecordModelForm, self).save(*args, **kwargs)
     
-    
 
-class GenericRecordModelForm(BaseRecordModelForm):
-    """Generic ModelForm for resource records.
-    
-    This special ModelForm manipulates the available RR types by excluding
-    those types for which a special ModelForm exists.
-    
-    """
-    # For now we copy the types from the Record model and comment out those,
-    # for which a special ModelForm exists. Lame, but that's how it is.
-    # TODO: create a modelform for each record type
-    AVAILABLE_RECORD_TYPE_CHOICES = (
-        ('A', 'A'),
-        ('AAAA', 'AAAA'),
-        ('AFSDB', 'AFSDB'),
-        ('CERT', 'CERT'),
-        ('CNAME', 'CNAME'),
-        ('DNSKEY', 'DNSKEY'),
-        ('DS', 'DS'),
-        ('HINFO', 'HINFO'),
-        ('KEY', 'KEY'),
-        ('LOC', 'LOC'),
-        #('MX', 'MX'),
-        ('NAPTR', 'NAPTR'),
-        #('NS', 'NS'),
-        ('NSEC', 'NSEC'),
-        ('PTR', 'PTR'),
-        ('RP', 'RP'),
-        ('RRSIG', 'RRSIG'),
-        #('SOA', 'SOA'),
-        ('SPF', 'SPF'),
-        ('SSHFP', 'SSHFP'),
-        #('SRV', 'SRV'),
-        ('TXT', 'TXT'),
-    )
-    type_avail = forms.ChoiceField(initial='', required=True, choices=AVAILABLE_RECORD_TYPE_CHOICES, label=_('type'), help_text="""Select the resource record type.""")
+class ARecordModelForm(BaseRecordModelForm):
+    """ModelForm for A resource records."""
 
-    def __init__(self, *args, **kwargs):
-        if kwargs.has_key('instance'):
-            instance = kwargs['instance']
-            if instance.pk is not None:    # This check asserts that this is an EDIT
-                kwargs['initial'] = {
-                    'type_avail': instance.type,
-                }
-        super(GenericRecordModelForm, self).__init__(*args, **kwargs)
-    
     def save(self, *args, **kwargs):
-        if self.instance.name and self.instance.content:
-            self.instance.type = self.cleaned_data.get('type_avail')
-        return super(GenericRecordModelForm, self).save(*args, **kwargs)
+        self.instance.type = 'A'
+        return super(ARecordModelForm, self).save(*args, **kwargs)
+
+
+class AaaaRecordModelForm(BaseRecordModelForm):
+    """ModelForm for AAAA resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'AAAA'
+        return super(AaaaRecordModelForm, self).save(*args, **kwargs)
+
+
+class CnameRecordModelForm(BaseRecordModelForm):
+    """ModelForm for CNAME resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'CNAME'
+        return super(CnameRecordModelForm, self).save(*args, **kwargs)
+
+
+class PtrRecordModelForm(BaseRecordModelForm):
+    """ModelForm for PTR resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'PTR'
+        return super(PtrRecordModelForm, self).save(*args, **kwargs)
+
+
+class TxtRecordModelForm(BaseRecordModelForm):
+    """ModelForm for TXT resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'TXT'
+        return super(TxtRecordModelForm, self).save(*args, **kwargs)
+
+
+class DsRecordModelForm(BaseRecordModelForm):
+    """ModelForm for DS resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'DS'
+        return super(DsRecordModelForm, self).save(*args, **kwargs)
+
+
+class CertRecordModelForm(BaseRecordModelForm):
+    """ModelForm for CERT resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'CERT'
+        return super(CertRecordModelForm, self).save(*args, **kwargs)
+
+
+class HinfoRecordModelForm(BaseRecordModelForm):
+    """ModelForm for HINFO resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'HINFO'
+        return super(HinfoRecordModelForm, self).save(*args, **kwargs)
+
+
+class LocRecordModelForm(BaseRecordModelForm):
+    """ModelForm for LOC resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'LOC'
+        return super(LocRecordModelForm, self).save(*args, **kwargs)
+
+
+class SpfRecordModelForm(BaseRecordModelForm):
+    """ModelForm for SPF resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'SPF'
+        return super(SpfRecordModelForm, self).save(*args, **kwargs)
+
+
+class SshfpRecordModelForm(BaseRecordModelForm):
+    """ModelForm for SSHFP resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'SSHFP'
+        return super(SshfpRecordModelForm, self).save(*args, **kwargs)
+
+
+class RpRecordModelForm(BaseRecordModelForm):
+    """ModelForm for RP resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'RP'
+        return super(RpRecordModelForm, self).save(*args, **kwargs)
+
+
+class NaptrRecordModelForm(BaseRecordModelForm):
+    """ModelForm for NAPTR resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'NAPTR'
+        return super(NaptrRecordModelForm, self).save(*args, **kwargs)
+
+
+class AfsdbRecordModelForm(BaseRecordModelForm):
+    """ModelForm for AFSDB resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'AFSDB'
+        return super(AfsdbRecordModelForm, self).save(*args, **kwargs)
+
+
+class DnskeyRecordModelForm(BaseRecordModelForm):
+    """ModelForm for DNSKEY resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'DNSKEY'
+        return super(DnskeyRecordModelForm, self).save(*args, **kwargs)
+
+
+class KeyRecordModelForm(BaseRecordModelForm):
+    """ModelForm for KEY resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'KEY'
+        return super(KeyRecordModelForm, self).save(*args, **kwargs)
+
+
+class NsecRecordModelForm(BaseRecordModelForm):
+    """ModelForm for NSEC resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'NSEC'
+        return super(NsecRecordModelForm, self).save(*args, **kwargs)
+
+
+class RrsigRecordModelForm(BaseRecordModelForm):
+    """ModelForm for RRSIG resource records."""
+
+    def save(self, *args, **kwargs):
+        self.instance.type = 'RRSIG'
+        return super(RrsigRecordModelForm, self).save(*args, **kwargs)
 
 
 
