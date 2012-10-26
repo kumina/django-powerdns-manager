@@ -39,6 +39,34 @@ class BaseRecordModelForm(forms.ModelForm):
     class Meta:
         model = cache.get_model('powerdns_manager', 'Record')
     
+    def clean(self):
+        """ModelForm clean code for all Record ModelForms.
+        
+        1) Makes sure the RR's name is within the current zone.
+        
+        For instance, if the zone origin is 'centos.example.org', the user
+        will not be able to add records with a name 'example.org'. Such a
+        name would belong to the parent zone and is bogus information if
+        added to the current zone.
+        
+        """
+        # Check 1: Makes sure the RR's name is within the current zone.
+        
+        # This ensures that we do not catch a SOA record, for which the name
+        # is added in the SoaRecordModelForm.save(). A SOA record will never
+        # have a bogus name, since it is not user-editable. 
+        if not self.cleaned_data.has_key('name'):
+            return self.cleaned_data
+        
+        name = self.cleaned_data.get('name')
+        domain = self.cleaned_data.get('domain')
+        if name and domain:
+            if len(name.split('.')) < len(domain.name.split('.')):
+                msg = 'Invalid record name. This name belongs to a parent zone.'
+                self._errors["name"] = self.error_class([msg])
+        
+        return self.cleaned_data
+
 
 
 class SoaRecordModelForm(BaseRecordModelForm):
