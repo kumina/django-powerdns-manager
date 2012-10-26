@@ -137,6 +137,8 @@ class Record(models.Model):
         #return '%s %s' % (self.type, self.name)
         return self.name
 
+# Signals are always executed in bulk operations, so they are preferred.
+
 # Set the ``name`` field on SOA records.
 signals.pre_save.connect(signal_cb.set_soa_rr_name, sender=Record)
 # Update ``change_date``
