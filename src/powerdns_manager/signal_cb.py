@@ -47,6 +47,11 @@ def set_soa_rr_name(sender, **kwargs):
 
 
 def update_rr_change_date(sender, **kwargs):
+    """Sets the current timestamp to the ``change_date`` field.
+    
+    This is used by PowerDNS.
+    
+    """
     instance = kwargs['instance']   # powerdns_manager.Record instance
     instance.change_date = int(time.time())
 
