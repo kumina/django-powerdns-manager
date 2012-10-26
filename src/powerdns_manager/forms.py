@@ -36,6 +36,9 @@ class BaseRecordModelForm(forms.ModelForm):
     """Base ModelForm for Record instances.
     
     """
+    class Meta:
+        model = cache.get_model('powerdns_manager', 'Record')
+    
 
 
 class SoaRecordModelForm(BaseRecordModelForm):
@@ -71,9 +74,6 @@ class SoaRecordModelForm(BaseRecordModelForm):
     retry = forms.IntegerField(min_value=300, initial=7200, required=True, label=_('retry'), help_text="""This specifies the number of seconds a slave nameserver should wait before retrying if it attmepts to transfer this zone but fails. Example: 7200""")
     expire = forms.IntegerField(min_value=300, initial=604800, required=True, label=_('expire'), help_text="""If for expire seconds the primary server cannot be reached, all information about the zone is invalidated on the secondary servers (i.e., they are no longer authoritative for that zone). Example: 604800""")
     default_ttl = forms.IntegerField(min_value=300, initial=86400, required=True, label=_('minimum TTL'), help_text="""The minimum TTL field that should be exported with any RR from this zone. If any RR in the database has a lower TTL, this TTL is sent instead. Example: 86400""")
-
-    class Meta:
-        model = cache.get_model('powerdns_manager', 'Record')
 
     def __init__(self, *args, **kwargs):
         """ModelForm constructor.
@@ -170,9 +170,6 @@ class SoaRecordModelForm(BaseRecordModelForm):
 class NsRecordModelForm(BaseRecordModelForm):
     """ModelForm for NS resource records."""
 
-    class Meta:
-        model = cache.get_model('powerdns_manager', 'Record')
-
     def save(self, *args, **kwargs):
         self.instance.type = 'NS'
         return super(NsRecordModelForm, self).save(*args, **kwargs)
@@ -181,9 +178,6 @@ class NsRecordModelForm(BaseRecordModelForm):
 class MxRecordModelForm(BaseRecordModelForm):
     """ModelForm for MX resource records."""
 
-    class Meta:
-        model = cache.get_model('powerdns_manager', 'Record')
-
     def save(self, *args, **kwargs):
         self.instance.type = 'MX'
         return super(MxRecordModelForm, self).save(*args, **kwargs)
@@ -191,9 +185,6 @@ class MxRecordModelForm(BaseRecordModelForm):
 
 class SrvRecordModelForm(BaseRecordModelForm):
     """ModelForm for SRV resource records."""
-
-    class Meta:
-        model = cache.get_model('powerdns_manager', 'Record')
 
     def save(self, *args, **kwargs):
         self.instance.type = 'SRV'
@@ -236,9 +227,6 @@ class GenericRecordModelForm(BaseRecordModelForm):
         ('TXT', 'TXT'),
     )
     type_avail = forms.ChoiceField(initial='', required=True, choices=AVAILABLE_RECORD_TYPE_CHOICES, label=_('type'), help_text="""Select the resource record type.""")
-
-    class Meta:
-        model = cache.get_model('powerdns_manager', 'Record')
 
     def __init__(self, *args, **kwargs):
         if kwargs.has_key('instance'):
