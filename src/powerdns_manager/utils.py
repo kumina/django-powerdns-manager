@@ -27,6 +27,7 @@
 import time
     
 import dns.zone
+from dns.zone import BadZone, NoSOA, NoNS, UnknownOrigin
 from dns.exception import DNSException
 from dns.rdataclass import *
 from dns.rdatatype import *
@@ -59,6 +60,8 @@ def process_zone_file(origin, zonetext):
     
     try:
         zone = dns.zone.from_text(zonetext, origin=origin, relativize=False)
+        if not str(zone.origin).rstrip('.'):
+            raise UnknownOrigin
         
         # Create a domain instance
         the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE')
@@ -130,6 +133,15 @@ def process_zone_file(origin, zonetext):
                     
                     rr.save()
 
+    except NoSOA:
+        raise Exception('The zone has no SOA RR at its origin.')
+    except NoNS:
+        raise Exception('The zone has no NS RRset at its origin.')
+    except UnknownOrigin:
+        raise Exception('The zone\'s origin is unknown.')
+    except BadZone:
+        raise Exception('The zone is malformed.')
     except DNSException, e:
-        print e.__class__, e
+        #raise Exception(str(e))
+        raise Exception('The zone is malformed.')
 
