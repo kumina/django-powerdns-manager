@@ -103,7 +103,26 @@ class SoaRecordModelForm(forms.ModelForm):
         return hostmaster
     
     def save(self, *args, **kwargs):
+        """Saves the SOA RR ModelForm.
+        
+        Model fields that were not editable in the admin interface are set here.
+        
+        1) The SOA type is set.
+        
+        2) The values of these extra SOA-specific fields are concatenated
+        in order to form the SOA RR content that PowerDNS expects to find
+        stored in the database.
+        
+        3) The TTL field, if missing, is set equal to the ``default_ttl``
+        form field.
+        
+        4) Sets the ``name`` field of the SOA record equal to the name of the
+        associated domain. PowerDNS Manager allows only one SOA RR per zone.
+        The ``name`` field of the SOA record is not editable in the ModelAdmin.
+        
+        """
         self.instance.type = 'SOA'
+        
         self.instance.content = '%s %s %d %s %s %s %s' % (
             self.cleaned_data.get('primary'),
             self.cleaned_data.get('hostmaster'),
@@ -113,8 +132,13 @@ class SoaRecordModelForm(forms.ModelForm):
             self.cleaned_data.get('expire'),
             self.cleaned_data.get('default_ttl')
         )
+        
         if not self.instance.ttl:
             self.instance.ttl = self.cleaned_data.get('default_ttl')
+        
+        domain = self.cleaned_data.get('domain')
+        self.instance.name = domain.name
+        
         return super(SoaRecordModelForm, self).save(*args, **kwargs)
         
 
