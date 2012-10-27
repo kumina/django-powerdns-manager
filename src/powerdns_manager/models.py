@@ -90,6 +90,9 @@ class Domain(models.Model):
         else:
             return soa_rr.content.split()[-1]
 
+signals.post_save.connect(signal_cb.rectify_zone_cb, sender=Domain)
+
+
 
 class Record(models.Model):
     """Model for PowerDNS resource record.

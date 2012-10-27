@@ -23,3 +23,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+
+from powerdns_manager.utils import rectify_zone
+
+
+def rectify_zone_cb(sender, **kwargs):
+    """Signal callback that rectifies the zone."""
+    instance = kwargs['instance']
+    rectify_zone(instance.name)
+

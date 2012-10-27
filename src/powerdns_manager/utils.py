@@ -147,6 +147,8 @@ def process_zone_file(origin, zonetext, overwrite=False):
                     # TODO: add support for more records
                     
                     rr.save()
+                    the_domain.save()   # Not required, but rectifies the zone for us.
+                    
 
     except NoSOA:
         raise Exception('The zone has no SOA RR at its origin.')
@@ -160,3 +162,271 @@ def process_zone_file(origin, zonetext, overwrite=False):
         #raise Exception(str(e))
         raise Exception('The zone is malformed.')
 
+
+
+def rectify_zone(origin):
+    """Fix up DNSSEC fields (order, auth).
+    
+    *****
+    Special kudos to the folks at the #powerdns IRC channel for the help,
+    especially Habbie and Maik. 
+    *****
+    
+    rectify_zone() accepts a string containing the zone origin.
+    Returns nothing.
+    
+    PowerDNS Documentation at Chapter 12 Section 8.5:
+    
+        http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database
+    
+    If you ever need to read this code and you are not much into DNS stuff,
+    here is some information about the involved DNS Resource Records and the
+    terminology used.
+    
+    * A: http://www.simpledns.com/help/v52/index.html?rec_a.htm
+    * AAAA: http://www.simpledns.com/help/v52/index.html?rec_aaaa.htm
+    * DS: http://www.simpledns.com/help/v52/index.html?rec_ds.htm
+    * NS: http://www.simpledns.com/help/v52/index.html?rec_ns.htm
+    
+    Terminology:
+    
+    * Glue: Glue records are needed to prevent circular references. Circular
+      references exist where the name servers for a domain can't be resolved
+      without resolving the domain they're responsible for. For example, if
+      the name servers for yourdomain.com are ns1.yourdomain.com and
+      ns2.yourdomain.com, the DNS client would not be able to get to either
+      name server without knowing where yourdomain.com is. But this information
+      is held by those name servers! A glue record is a hint that is provided
+      by the parent DNS server.
+      More at: http://www.webdnstools.com/dnstools/articles/glue_records
+    
+    * Delegation: When the authoritative name server for a domain receives
+      a request for a subdomain's records and responds with NS records for
+      other name servers, that is DNS delegation.
+    
+    
+    AUTH Field
+    ==========
+    
+    The 'auth' field should be set to '1' for data for which the zone
+    itself is authoritative, which includes the SOA record and its own NS
+    records.
+    
+    The 'auth' field should be 0 however for NS records which are used for
+    delegation, and also for any glue (A, AAAA) records present for this
+    purpose. Do note that the DS record for a secure delegation should be
+    authoritative!
+    
+        ~~~~ PowerDNS Documentation at Chapter 12 Section 8.5
+      
+    Rules used in the following code
+    --------------------------------
+    
+    1. A & AAAA records (glue) of delegated names always get auth=0
+    2. DS records (used for secure delegation) get auth=1
+    3. Delegating NS records get auth=0
+    
+    
+    ORDERNAME Field
+    ===============
+    
+    The 'ordername' field needs to be filled out depending on the NSEC/NSEC3
+    mode. When running in NSEC3 'Narrow' mode, the ordername field is ignored
+    and best left empty. In NSEC mode, the ordername field should be NULL for
+    any glue but filled in for delegation NS records and all authoritative
+    records. In NSEC3 opt-out mode (the only NSEC3 mode PowerDNS currently
+    supports), any non-authoritative records (as described for the 'auth'
+    field) should have ordername set to NULL.
+
+    In 'NSEC' mode, it should contain the relative part of a domain name,
+    in reverse order, with dots replaced by spaces. So 'www.uk.powerdnssec.org'
+    in the 'powerdnssec.org' zone should have 'uk www' as its ordername.
+
+    In 'NSEC3' non-narrow mode, the ordername should contain a lowercase
+    base32hex encoded representation of the salted & iterated hash of the full
+    record name. pdnssec hash-zone-record zone record can be used to calculate
+    this hash. 
+    
+        ~~~~ PowerDNS Documentation at Chapter 12 Section 8.5
+    
+    Rules used in the following code
+    --------------------------------
+    
+    If no crypto keys are present for the domain, DNSSEC is not enabled,
+    so the ``ordername`` field is not necessary to be filled. However, this
+    function always fills the ``ordername`` field regardless of the existence
+    of crypto keys in the cryptokeys table. ``pdnssec rectify-zone ...`` fills
+    the ordername field regardless of the existence of keys in cryptokeys,
+    so we stick to that functionality.
+    
+    Modes are distinguished by the following criteria:
+    
+    (a) domain has no DNSSEC: there are no keys in cryptokeys
+    (b) domain has DNSSEC with NSEC: there are keys in cryptokeys, and nothing about NSEC3 in domainmetadata
+    (c) domain has DNSSEC with narrow NSEC3: cryptokeys+NSEC3PARAM+NSEC3NARROW
+    (d) domain has DNSSEC with non-narrow NSEC3: cryptokeys+NSEC3PARAM
+    (e) domain has DNSSEC with opt-out NSEC3: cryptokeys+NSEC3PARAM
+    
+    Note: non-narrow and opt-out NSEC3 modes cannot be distinguished. All rules
+    mentioned in the documentation for these two modes apply if there are
+    cryptokeys+NSEC3PARAM.
+    
+    Note 2: there is never a case in which ordername is filled in on glue record.
+    
+    1) ordername in NSEC mode:
+        - NULL for glue (A, AAAA) records
+        - Filled for:
+            a) delegation NS records
+            b) all authoritative records (auth=1)
+          It should contain the relative part of a domain name, in reverse
+          order, with dots replaced by spaces.
+          
+    2) ordername in NSEC3 'Narrow' mode:
+        - empty (but not NULL)
+    
+    3) ordername in NSEC3 'Opt-out' or 'Non-Narrow' modes:
+        - NULL for non-authoritative records (auth=0)
+        - lowercase base32hex encoded representation of the salted & iterated
+          hash of the full record name for authoritative records (auth=1)
+    
+    
+    EMPTY NON-TERMINALS
+    ===================
+    
+    TODO: implement empty terminal support
+    
+    In addition, from 3.2 and up, PowerDNS fully supports empty non-terminals.
+    If you have a zone example.com, and a host a.b.c.example.com in it,
+    rectify-zone (and the AXFR client code) will insert b.c.example.com and
+    c.example.com in the records table with type NULL (SQL NULL, not 'NULL').
+    Having these entries provides several benefits. We no longer reply NXDOMAIN
+    for these shorter names (this was an RFC violation but not one that caused
+    trouble). But more importantly, to do NSEC3 correctly, we need to be able
+    to prove existence of these shorter names. The type=NULL records entry
+    gives us a place to store the NSEC3 hash of these names.
+
+    If your frontend does not add empty non-terminal names to records, you will
+    get DNSSEC replies of 3.1-quality, which has served many people well, but
+    we suggest you update your code as soon as possible!
+    
+        ~~~~ PowerDNS Documentation at Chapter 12 Section 8.5
+    
+    """
+    Domain = cache.get_model('powerdns_manager', 'Domain')
+    Record = cache.get_model('powerdns_manager', 'Record')
+    DomainMetadata = cache.get_model('powerdns_manager', 'DomainMetadata')
+    CryptoKey = cache.get_model('powerdns_manager', 'CryptoKey')
+    
+    # List containing domain parts
+    origin_parts = origin.split('.')
+    
+    # Get the Domain instance that corresponds to the supplied origin
+    # TODO: Do some exception handling here in case domain does not exist
+    the_domain = Domain.objects.get(name=origin)
+    
+    # Get a list of the zone's records
+    zone_rr_list = Record.objects.filter(domain__name=origin)
+    
+    # Find delegated names by checking the names of all NS and DS records.
+    delegated_names_list = []
+    for rr in zone_rr_list:
+        if rr.type not in ('NS', 'DS'):
+            continue
+        rr_name_parts = rr.name.split('.')
+        if len(rr_name_parts) > len(origin_parts):
+            # name is delegated
+            if rr.name not in delegated_names_list:
+                delegated_names_list.append(rr.name)
+    
+    
+    # AUTH field management
+    
+    # Set auth=1 on all records initially
+    for rr in zone_rr_list:
+        rr.auth = True
+    
+    for delegated_name in delegated_names_list:
+        
+        # Set auth=0 to A & AAAA records (glue) of delegated names
+        for rr in zone_rr_list:
+            if rr.name == delegated_name and rr.type in ('A', 'AAAA'):
+                rr.auth = False
+    
+        # DS records should already have auth=1
+        
+        # Set auth=0 to NS records
+        for rr in zone_rr_list:
+            if rr.name == delegated_name and rr.type == 'NS':
+                rr.auth = False
+    
+    
+    # ORDERNAME field management
+    
+    # If no crypto keys are present for the domain, DNSSEC is not enabled,
+    # so the ``ordername`` field is not necessary to be filled. However, the
+    # following code always fills the ``ordername`` field. 
+    qs = CryptoKey.objects.filter(domain=the_domain)
+    if not len(qs):
+        # This is not a DNSSEC-enabled domain.
+        # We still fill the ordername field as mentioned in the docstring.
+        pass
+    
+    # Decide NSEC mode:
+    try:
+        nsec3 = DomainMetadata.objects.get(
+            domain=the_domain, kind__startswith='NSEC3')
+    except DomainMetadata.DoesNotExist:
+        # NSEC Mode
+        
+        for rr in zone_rr_list:
+            
+            # Generate ordername content
+            name_parts = rr.name.split('.')
+            ordername_content_parts = name_parts[:-3]
+            ordername_content_parts.reverse()
+            ordername_content = ' '.join(ordername_content_parts)
+                
+            if rr.name in delegated_names_list:
+            
+                # Set ordername=NULL for A & AAAA records of delegated names (glue)
+                if rr.type in ('A', 'AAAA'):
+                    rr.ordername = None
+                
+                # Fill ordername for: Delegation NS records
+                elif rr.type == 'NS':
+                    rr.ordername = ordername_content
+            
+            # Fill ordername for: All auth=1 records
+            if rr.auth:
+                rr.ordername = ordername_content
+        
+    else:
+        # NSEC3 Mode
+        try:
+            nsec3narrow = DomainMetadata.objects.get(
+                domain=the_domain, kind='NSEC3NARROW')
+        except DomainMetadata.DoesNotExist:
+            # NSEC3 'Non-Narrow', 'Opt-out' mode
+            for rr in zone_rr_list:
+                if rr.auth:
+                    # TODO: implement base32hex encoding
+                    rr.ordername = '_base32hex_'
+                else:
+                    rr.ordername = None
+        else:
+            # NSEC3 'Narrow' Mode
+            for rr in zone_rr_list:
+                rr.ordername=''
+    
+    
+    # Save the records
+    # Since this is an internal maintenance function, the serial of the zone
+    # is not updated.
+    for rr in zone_rr_list:
+        rr.save()
+
+
+    
+    
+    
+    

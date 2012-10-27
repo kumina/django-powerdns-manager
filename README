@@ -20,9 +20,10 @@ exists in the license_ section.
 Features
 ========
 
-- Database schema supports DNSSEC. Currently, DNSSEC features should be managed by the pdnssec utility. (no native python code yet)
-- Multiuser support
-- Zone file import (experimental)
+- Multiuser web interface using the Django admin app.
+- Database schema is DNSSEC enabled.
+- Automatic zone-rectify support using native python code.
+- Zone file import through web form (experimental)
 
 
 TODO: Add more info
