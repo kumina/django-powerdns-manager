@@ -64,6 +64,26 @@ from powerdns_manager.forms import RrsigRecordModelForm
 #test_action.short_description = "Test Action"
 
 
+class BaseTabularRecordInline(admin.TabularInline):
+    RR_TYPE = '__OVERRIDE__'
+    form = '__OVERRIDE__'
+    model = cache.get_model('powerdns_manager', 'Record')
+    extra = 0
+    fields = ('name', 'ttl', 'content', 'date_modified')
+    readonly_fields = ('date_modified', )
+    
+    def __init__(self, *args, **kwargs):
+        self.verbose_name = '%s Resource Record' % self.RR_TYPE
+        self.verbose_name_plural = '%s Resource Records' % self.RR_TYPE
+        super(BaseTabularRecordInline, self).__init__(*args, **kwargs)
+        
+    def queryset(self, request):
+        """Return only RR_TYPE records"""
+        qs = super(BaseTabularRecordInline, self).queryset(request)
+        return qs.filter(type=self.RR_TYPE)
+
+
+
 class SoaRecordInline(admin.StackedInline):
     model = cache.get_model('powerdns_manager', 'Record')
     form = SoaRecordModelForm
@@ -84,319 +104,91 @@ class SoaRecordInline(admin.StackedInline):
         return qs.filter(type='SOA')
 
 
-class NsRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class NsRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'NS'
     form = NsRecordModelForm
-    extra = 0
-    verbose_name = 'NS Resource Record'
-    verbose_name_plural = 'NS Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only NS records"""
-        qs = super(NsRecordInline, self).queryset(request)
-        return qs.filter(type='NS')
 
-
-class MxRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class MxRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'MX'
     form = MxRecordModelForm
-    extra = 0
-    verbose_name = 'MX Resource Record'
-    verbose_name_plural = 'MX Resource Records'
     fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
     
-    def queryset(self, request):
-        """Return only MX records"""
-        qs = super(MxRecordInline, self).queryset(request)
-        return qs.filter(type='MX')
-    
-
-class SrvRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class SrvRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'SRV'
     form = SrvRecordModelForm
-    extra = 0
-    verbose_name = 'SRV Resource Record'
-    verbose_name_plural = 'SRV Resource Records'
     fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only SRV records"""
-        qs = super(SrvRecordInline, self).queryset(request)
-        return qs.filter(type='SRV')
 
-
-class ARecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class ARecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'A'
     form = ARecordModelForm
-    extra = 0
-    verbose_name = 'A Resource Record'
-    verbose_name_plural = 'A Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only A records"""
-        qs = super(ARecordInline, self).queryset(request)
-        return qs.filter(type='A')
 
-
-class AaaaRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class AaaaRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'AAAA'
     form = AaaaRecordModelForm
-    extra = 0
-    verbose_name = 'AAAA Resource Record'
-    verbose_name_plural = 'AAAA Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only AAAA records"""
-        qs = super(AaaaRecordInline, self).queryset(request)
-        return qs.filter(type='AAAA')
 
-
-class CnameRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class CnameRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'CNAME'
     form = CnameRecordModelForm
-    extra = 0
-    verbose_name = 'CNAME Resource Record'
-    verbose_name_plural = 'CNAME Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only CNAME records"""
-        qs = super(CnameRecordInline, self).queryset(request)
-        return qs.filter(type='CNAME')
 
-
-class PtrRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class PtrRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'PTR'
     form = PtrRecordModelForm
-    extra = 0
-    verbose_name = 'PTR Resource Record'
-    verbose_name_plural = 'PTR Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only PTR records"""
-        qs = super(PtrRecordInline, self).queryset(request)
-        return qs.filter(type='PTR')
 
-
-class TxtRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class TxtRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'TXT'
     form = TxtRecordModelForm
-    extra = 0
-    verbose_name = 'TXT Resource Record'
-    verbose_name_plural = 'TXT Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only TXT records"""
-        qs = super(TxtRecordInline, self).queryset(request)
-        return qs.filter(type='TXT')
 
-
-class DsRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class DsRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'DS'
     form = DsRecordModelForm
-    extra = 0
-    verbose_name = 'DS Resource Record'
-    verbose_name_plural = 'DS Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only DS records"""
-        qs = super(DsRecordInline, self).queryset(request)
-        return qs.filter(type='DS')
 
-
-class CertRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class CertRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'CERT'
     form = CertRecordModelForm
-    extra = 0
-    verbose_name = 'CERT Resource Record'
-    verbose_name_plural = 'CERT Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only CERT records"""
-        qs = super(CertRecordInline, self).queryset(request)
-        return qs.filter(type='CERT')
 
-
-class HinfoRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class HinfoRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'HINFO'
     form = HinfoRecordModelForm
-    extra = 0
-    verbose_name = 'HINFO Resource Record'
-    verbose_name_plural = 'HINFO Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only HINFO records"""
-        qs = super(HinfoRecordInline, self).queryset(request)
-        return qs.filter(type='HINFO')
 
-
-class LocRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class LocRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'LOC'
     form = LocRecordModelForm
-    extra = 0
-    verbose_name = 'LOC Resource Record'
-    verbose_name_plural = 'LOC Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only LOC records"""
-        qs = super(LocRecordInline, self).queryset(request)
-        return qs.filter(type='LOC')
 
-
-class SpfRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class SpfRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'SPF'
     form = SpfRecordModelForm
-    extra = 0
-    verbose_name = 'SPF Resource Record'
-    verbose_name_plural = 'SPF Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only SPF records"""
-        qs = super(SpfRecordInline, self).queryset(request)
-        return qs.filter(type='SPF')
 
-
-class SshfpRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class SshfpRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'SSHFP'
     form = SshfpRecordModelForm
-    extra = 0
-    verbose_name = 'SSHFP Resource Record'
-    verbose_name_plural = 'SSHFP Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only SSHFP records"""
-        qs = super(SshfpRecordInline, self).queryset(request)
-        return qs.filter(type='SSHFP')
 
-
-class RpRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class RpRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'RP'
     form = RpRecordModelForm
-    extra = 0
-    verbose_name = 'RP Resource Record'
-    verbose_name_plural = 'RP Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only RP records"""
-        qs = super(RpRecordInline, self).queryset(request)
-        return qs.filter(type='RP')
 
-
-class NaptrRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class NaptrRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'NAPTR'
     form = NaptrRecordModelForm
-    extra = 0
-    verbose_name = 'NAPTR Resource Record'
-    verbose_name_plural = 'NAPTR Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only NAPTR records"""
-        qs = super(NaptrRecordInline, self).queryset(request)
-        return qs.filter(type='NAPTR')
 
-
-class AfsdbRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class AfsdbRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'AFSDB'
     form = AfsdbRecordModelForm
-    extra = 0
-    verbose_name = 'AFSDB Resource Record'
-    verbose_name_plural = 'AFSDB Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only AFSDB records"""
-        qs = super(AfsdbRecordInline, self).queryset(request)
-        return qs.filter(type='AFSDB')
 
-
-class DnskeyRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class DnskeyRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'DNSKEY'
     form = DnskeyRecordModelForm
-    extra = 0
-    verbose_name = 'DNSKEY Resource Record'
-    verbose_name_plural = 'DNSKEY Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only DNSKEY records"""
-        qs = super(DnskeyRecordInline, self).queryset(request)
-        return qs.filter(type='DNSKEY')
 
-
-class KeyRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class KeyRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'KEY'
     form = KeyRecordModelForm
-    extra = 0
-    verbose_name = 'KEY Resource Record'
-    verbose_name_plural = 'KEY Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only KEY records"""
-        qs = super(KeyRecordInline, self).queryset(request)
-        return qs.filter(type='KEY')
 
-
-class NsecRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class NsecRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'NSEC'
     form = NsecRecordModelForm
-    extra = 0
-    verbose_name = 'NSEC Resource Record'
-    verbose_name_plural = 'NSEC Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only NSEC records"""
-        qs = super(NsecRecordInline, self).queryset(request)
-        return qs.filter(type='NSEC')
 
-
-class RrsigRecordInline(admin.TabularInline):
-    model = cache.get_model('powerdns_manager', 'Record')
+class RrsigRecordInline(BaseTabularRecordInline):
+    RR_TYPE = 'RRSIG'
     form = RrsigRecordModelForm
-    extra = 0
-    verbose_name = 'RRSIG Resource Record'
-    verbose_name_plural = 'RRSIG Resource Records'
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
-    
-    def queryset(self, request):
-        """Return only RRSIG records"""
-        qs = super(RrsigRecordInline, self).queryset(request)
-        return qs.filter(type='RRSIG')
 
 
 class DomainMetadataInline(admin.TabularInline):
