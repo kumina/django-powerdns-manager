@@ -53,7 +53,6 @@ from powerdns_manager.forms import DnskeyRecordModelForm
 from powerdns_manager.forms import KeyRecordModelForm
 from powerdns_manager.forms import NsecRecordModelForm
 from powerdns_manager.forms import RrsigRecordModelForm
-from powerdns_manager.forms import GenericRecordModelForm
 
 # Action for
 # - set change date
