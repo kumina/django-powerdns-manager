@@ -192,6 +192,25 @@ class RrsigRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'RRSIG'
     form = RrsigRecordModelForm
 
+class EmptyNonTerminalRecordInline(admin.TabularInline):
+    """Special inline for empty non-terminals supported by PowerDNS 3.2.
+    
+    See: http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database
+    
+    """
+    model = cache.get_model('powerdns_manager', 'Record')
+    extra = 0
+    verbose_name = 'Empty Non-Terminal Resource Record'
+    verbose_name_plural = 'Empty Non-Terminal Resource Record' # Only one SOA RR per zone
+    fields = ('name', 'ttl', 'content', 'date_modified')
+    readonly_fields = ('name', 'ttl', 'content', 'date_modified')
+    can_delete = False
+    
+    def queryset(self, request):
+        """Return only Empty Non-Terminal records"""
+        qs = super(EmptyNonTerminalRecordInline, self).queryset(request)
+        return qs.filter(type__isnull=True)
+
 
 class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
@@ -260,6 +279,7 @@ class DomainAdmin(admin.ModelAdmin):
         inlines.append(RR_INLINE_MAP[RR_TYPE])
     
     # Add other inlines
+    inlines.append(EmptyNonTerminalRecordInline)
     inlines.append(DomainMetadataInline)
     inlines.append(CryptoKeyInline)
     
