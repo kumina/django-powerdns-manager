@@ -279,7 +279,7 @@ class DomainAdmin(admin.ModelAdmin):
         inlines.append(RR_INLINE_MAP[RR_TYPE])
     
     # Add other inlines
-    inlines.append(EmptyNonTerminalRecordInline)
+    #inlines.append(EmptyNonTerminalRecordInline)    # TODO: empty non-terminal record support is for the future
     inlines.append(DomainMetadataInline)
     inlines.append(CryptoKeyInline)
     
