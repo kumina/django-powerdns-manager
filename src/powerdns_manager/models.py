@@ -134,7 +134,8 @@ class Record(models.Model):
         verbose_name_plural = _('records')
         get_latest_by = 'date_modified'
         ordering = ['type']
-        # TODO: Missing: CREATE INDEX nametype_index ON records(name,type);
+        # The following index is created by a MySQL statement in ``sql/record.mysql.sql``
+        #     CREATE INDEX nametype_index ON records(name,type);
         # SEE: http://stackoverflow.com/questions/1578195/django-create-index-non-unique-multiple-column
         
     def __unicode__(self):
@@ -164,9 +165,9 @@ class Record(models.Model):
         if not self.ttl:
             self.ttl = self.domain.get_minimum_ttl()
         
-        # TODO: set auth
-        
-        # TODO: set ordername
+        # auth and ordername fields are set automatically in
+        # ``signal_cb.rectify_zone_cb()`` signal callback, which is executed
+        # every time the Domain instance is saved.
         
         return super(Record, self).save(*args, **kwargs)
 
