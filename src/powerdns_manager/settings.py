@@ -34,3 +34,30 @@ PDNS_DEFAULT_RR_TTL = getattr(settings, 'PDNS_DEFAULT_RR_TTL', 86400)
 # Declares the server a SLAVE -- Will be used internally
 PDNS_IS_SLAVE = getattr(settings, 'PDNS_IS_SLAVE', False)
 
+# __ALL__ is special keyword that enables all record types
+_DEFAULT_PDNS_ENABLED_RR_TYPES = [
+    'SOA',
+    'NS',
+    'MX',
+    'A',
+    'AAAA',
+    'CNAME',
+    'PTR',
+    'TXT',
+    'SPF',
+    'SRV',
+    'CERT',
+    'DNSKEY',
+    'DS',
+    'KEY',
+    'NSEC',
+    'RRSIG',
+    'HINFO',
+    'LOC',
+    'NAPTR',
+    'RP',
+    'AFSDB',
+    'SSHFP',
+]
+PDNS_ENABLED_RR_TYPES = getattr(settings, 'PDNS_ENABLED_RR_TYPES', _DEFAULT_PDNS_ENABLED_RR_TYPES)
+

@@ -31,6 +31,8 @@ from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
 
 
+from powerdns_manager import settings
+
 from powerdns_manager.forms import SoaRecordModelForm
 from powerdns_manager.forms import NsRecordModelForm
 from powerdns_manager.forms import MxRecordModelForm
@@ -207,6 +209,8 @@ class CryptoKeyInline(admin.TabularInline):
     verbose_name_plural = 'Crypto Keys'
 
 
+
+
 class DomainAdmin(admin.ModelAdmin):
     #form = DomainModelForm
     #actions = [test_action, ]
@@ -216,37 +220,77 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'master', 'date_modified')
     list_filter = ('type', )
     search_fields = ('name', 'master')
-    inlines = [
-        # RR
-        SoaRecordInline,
-        NsRecordInline,
-        MxRecordInline,
-        ARecordInline,
-        AaaaRecordInline,
-        CnameRecordInline,
-        PtrRecordInline,
-        TxtRecordInline,
-        SrvRecordInline,
-        DsRecordInline,
-        CertRecordInline,
-        HinfoRecordInline,
-        LocRecordInline,
-        SpfRecordInline,
-        SshfpRecordInline,
-        RpRecordInline,
-        NaptrRecordInline,
-        AfsdbRecordInline,
-        DnskeyRecordInline,
-        KeyRecordInline,
-        NsecRecordInline,
-        RrsigRecordInline,
-        # Other
-        DomainMetadataInline,
-        CryptoKeyInline,
-    ]
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
+    
+#    inlines = [
+#        # RR
+#        SoaRecordInline,
+#        NsRecordInline,
+#        MxRecordInline,
+#        ARecordInline,
+#        AaaaRecordInline,
+#        CnameRecordInline,
+#        PtrRecordInline,
+#        TxtRecordInline,
+#        SrvRecordInline,
+#        DsRecordInline,
+#        CertRecordInline,
+#        HinfoRecordInline,
+#        LocRecordInline,
+#        SpfRecordInline,
+#        SshfpRecordInline,
+#        RpRecordInline,
+#        NaptrRecordInline,
+#        AfsdbRecordInline,
+#        DnskeyRecordInline,
+#        KeyRecordInline,
+#        NsecRecordInline,
+#        RrsigRecordInline,
+#        # Other
+#        DomainMetadataInline,
+#        CryptoKeyInline,
+#    ]
+    
+    #
+    # Build the ``inlines`` list. Only inlines for enabled RR types are included.
+    # 
+    inlines = []
+    
+    # Resource Record type to Resource Record Inline Map
+    RR_INLINE_MAP = {
+        'A':        ARecordInline,
+        'AAAA':     AaaaRecordInline,
+        'AFSDB':    AfsdbRecordInline,
+        'CERT':     CertRecordInline,
+        'CNAME':    CnameRecordInline,
+        'DNSKEY':   DnskeyRecordInline,
+        'DS':       DsRecordInline,
+        'HINFO':    HinfoRecordInline,
+        'KEY':      KeyRecordInline,
+        'LOC':      LocRecordInline,
+        'MX':       MxRecordInline,
+        'NAPTR':    NaptrRecordInline,
+        'NS':       NsRecordInline,
+        'NSEC':     NsecRecordInline,
+        'PTR':      PtrRecordInline,
+        'RP':       RpRecordInline,
+        'RRSIG':    RrsigRecordInline,
+        'SOA':      SoaRecordInline,
+        'SPF':      SpfRecordInline,
+        'SSHFP':    SshfpRecordInline,
+        'SRV':      SrvRecordInline,
+        'TXT':      TxtRecordInline,
+    }
+    
+    # Add RR inlines
+    for RR_TYPE in settings.PDNS_ENABLED_RR_TYPES:
+        inlines.append(RR_INLINE_MAP[RR_TYPE])
+    
+    # Add other inlines
+    inlines.append(DomainMetadataInline)
+    inlines.append(CryptoKeyInline)
     
     def queryset(self, request):
         qs = super(DomainAdmin, self).queryset(request)
