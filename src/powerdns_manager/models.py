@@ -110,30 +110,7 @@ class Record(models.Model):
     RECORD_TYPE_CHOICES = []
     for enabled_rr_type in settings.PDNS_ENABLED_RR_TYPES:
         RECORD_TYPE_CHOICES.append( (enabled_rr_type, enabled_rr_type) )
-#    RECORD_TYPE_CHOICES = (
-#        ('A', 'A'),
-#        ('AAAA', 'AAAA'),
-#        ('AFSDB', 'AFSDB'),
-#        ('CERT', 'CERT'),
-#        ('CNAME', 'CNAME'),
-#        ('DNSKEY', 'DNSKEY'),
-#        ('DS', 'DS'),
-#        ('HINFO', 'HINFO'),
-#        ('KEY', 'KEY'),
-#        ('LOC', 'LOC'),
-#        ('MX', 'MX'),
-#        ('NAPTR', 'NAPTR'),
-#        ('NS', 'NS'),
-#        ('NSEC', 'NSEC'),
-#        ('PTR', 'PTR'),
-#        ('RP', 'RP'),
-#        ('RRSIG', 'RRSIG'),
-#        ('SOA', 'SOA'),
-#        ('SPF', 'SPF'),
-#        ('SSHFP', 'SSHFP'),
-#        ('SRV', 'SRV'),
-#        ('TXT', 'TXT'),
-#    )
+
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain', verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""))
     name = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_('name'), help_text="""Actual name of a record. Must not end in a '.' and be fully qualified - it is not relative to the name of the domain!  For example: www.test.com (no trailing dot)""")
     # See section 8.5 about why the type field allows NULL. (PowerDNS 3.2 and above)

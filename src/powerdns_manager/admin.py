@@ -224,35 +224,6 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name_plural = 'zones'
     save_on_top = True
     
-#    inlines = [
-#        # RR
-#        SoaRecordInline,
-#        NsRecordInline,
-#        MxRecordInline,
-#        ARecordInline,
-#        AaaaRecordInline,
-#        CnameRecordInline,
-#        PtrRecordInline,
-#        TxtRecordInline,
-#        SrvRecordInline,
-#        DsRecordInline,
-#        CertRecordInline,
-#        HinfoRecordInline,
-#        LocRecordInline,
-#        SpfRecordInline,
-#        SshfpRecordInline,
-#        RpRecordInline,
-#        NaptrRecordInline,
-#        AfsdbRecordInline,
-#        DnskeyRecordInline,
-#        KeyRecordInline,
-#        NsecRecordInline,
-#        RrsigRecordInline,
-#        # Other
-#        DomainMetadataInline,
-#        CryptoKeyInline,
-#    ]
-    
     #
     # Build the ``inlines`` list. Only inlines for enabled RR types are included.
     # 
