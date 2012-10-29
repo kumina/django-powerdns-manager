@@ -147,7 +147,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
                     # TODO: add support for more records
                     
                     rr.save()
-                    the_domain.save()   # Not required, but rectifies the zone for us.
+                    the_domain.save()   # TODO: call rectify_zone(the_domain.name)
                     
 
     except NoSOA:
