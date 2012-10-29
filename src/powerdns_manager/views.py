@@ -80,6 +80,9 @@ def import_zone_view(request):
 @csrf_exempt
 def dynamic_ip_update_view(request):
     """
+    
+    TODO: explain dynamic IP update options and logic
+    
     if hostname is missing, the ips of all A and AAAA records of the zone are changed
     otherwise only the specific record with the name=hostname and provided that the
     correct ip (v4, v6) has been provided for the type of the record (A, AAAA)
@@ -87,7 +90,7 @@ def dynamic_ip_update_view(request):
     curl -k \
         -F "api_key=UBSE1RJ0J175MRAMJC31JFUH" \
         -F "hostname=ns1.centos.example.org" \
-        -F "ipv4=128.1.2.3" \
+        -F "ipv4=10.1.2.3" \
         -F "ipv6=3ffe:1900:4545:3:200:f8ff:fe21:67cf" \
         https://centos.example.org/powerdns/update/
 
