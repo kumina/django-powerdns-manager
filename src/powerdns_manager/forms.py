@@ -25,6 +25,7 @@
 #
 
 import time
+import re
 
 from django import forms
 from django.db.models.loading import cache
@@ -372,3 +373,53 @@ class ZoneImportForm(forms.Form):
     zonetext = forms.CharField(widget=forms.Textarea, initial='', required=True, label=_('Zone file'), help_text="""Paste the zone file text. (required)""")
     overwrite = forms.BooleanField(required=False, label=_('Overwrite'), help_text="""If checked, existing zone will be replaced by this one. Proceed with caution.""")
 
+
+
+class DynamicIPUpdateForm(forms.Form):
+    """This form is used to validate the supplied data in the POST request.
+    
+    """
+    api_key = forms.CharField(max_length=24, required=True)
+    hostname = forms.CharField(max_length=128, required=False)
+    ipv4 = forms.GenericIPAddressField(protocol='IPv4', required=False)
+    ipv6 = forms.GenericIPAddressField(protocol='IPv6', required=False)
+
+    def clean_api_key(self):
+        """Checks the provided API key.
+        
+        1) The key must contain [A-Z0-9]
+        2) A dynamic zone must be configured with the supplied key
+        
+        """
+        api_key = self.cleaned_data.get('api_key')
+
+        if not re.match('^[A-Z0-9]+$', api_key):
+            raise forms.ValidationError('Invalid API key')
+        
+        DynamicZone = cache.get_model('powerdns_manager', 'DynamicZone')
+        try:
+            DynamicZone.objects.get(api_key__exact=api_key)
+        except DynamicZone.DoesNotExist:
+            raise forms.ValidationError('Invalid API key')
+        else:
+            return api_key
+    
+    def clean_hostname(self):
+        """Checks the provided hostname.
+        
+        Hostname may be empty.
+        
+        Performs sanity checks.
+        
+        """
+        hostname = self.cleaned_data.get('hostname')
+        
+        if not hostname:
+            return hostname
+        
+        if not re.match('^[A-Za-z0-9._\-]+$', hostname):
+            raise forms.ValidationError('Invalid hostname')
+        
+        return hostname
+        
+   

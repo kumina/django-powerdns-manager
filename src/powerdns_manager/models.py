@@ -309,3 +309,30 @@ class TsigKey(models.Model):
         return self.name
 
 
+
+class DynamicZone(models.Model):
+    """Model for Dynamic Zones.
+    
+    This is a PowerDNS Manager feature to support updating, the A and AAAA
+    resource records of a zone over HTTP.
+    
+    This feature can be used to easily update the IP of hosts whose IP
+    address is dynamic.
+    
+    """
+    domain = models.ForeignKey('powerdns_manager.Domain', unique=True, related_name='%(app_label)s_%(class)s_domain', verbose_name=_('domain'), help_text=_("""Select the domain, the A and AAAA records of which might be updated dynamically over HTTP."""))
+    api_key = models.CharField(max_length=24, verbose_name=_('API Key'), help_text="""The API key is generated automatically. To reset it, use the relevant action in the changelist view.""")
+
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
+    date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
+    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
+    
+    class Meta:
+        verbose_name = _('dynamic zone')
+        verbose_name_plural = _('dynamic zones')
+        get_latest_by = 'date_modified'
+        ordering = ['-date_created']
+        
+    def __unicode__(self):
+        return self.domain.name
+

@@ -29,10 +29,9 @@ from django.db.models.loading import cache
 from django.contrib import messages
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils.crypto import get_random_string
 
 from powerdns_manager import settings
-
 from powerdns_manager.forms import SoaRecordModelForm
 from powerdns_manager.forms import NsRecordModelForm
 from powerdns_manager.forms import MxRecordModelForm
@@ -95,7 +94,7 @@ class SoaRecordInline(admin.StackedInline):
     verbose_name = 'SOA Resource Record'
     verbose_name_plural = 'SOA Resource Record' # Only one SOA RR per zone
     # The ``name`` field is not available for editing. It is always set to the
-    # name of the domain in ``forms.SoaRecordModelForm.save()`` callback.
+    # name of the domain in ``forms.SoaRecordModelForm.save()`` method.
     fields = ('ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl', 'date_modified')
     readonly_fields = ('date_modified', )
     can_delete = False
@@ -333,4 +332,48 @@ class SuperMasterAdmin(admin.ModelAdmin):
     verbose_name_plural = 'SuperMasters'
     
 admin.site.register(cache.get_model('powerdns_manager', 'SuperMaster'), SuperMasterAdmin)
+
+
+
+class DynamicZoneAdmin(admin.ModelAdmin):
+    fields = ('domain', 'api_key', 'date_created', 'date_modified')
+    readonly_fields = ('api_key', 'date_created', 'date_modified')
+    list_display = ('domain', 'date_created', 'date_modified')
+    search_fields = ('domain', )
+    verbose_name = 'Dynamic Zone'
+    verbose_name_plural = 'Dynamic Zones'
+    actions = ['reset_api_key']
+
+    def reset_api_key(self, request, queryset):
+        for obj in queryset:
+            obj.api_key = self._get_new_api_key()
+            obj.save()
+    reset_api_key.short_description = "Reset API Key"
+    
+    def queryset(self, request):
+        qs = super(DynamicZoneAdmin, self).queryset(request)
+        if not request.user.is_superuser:
+            # Non-superusers see the dynamic zones they have created
+            qs = qs.filter(created_by=request.user)
+        return qs
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        Domain = cache.get_model('powerdns_manager', 'Domain')
+        if db_field.name == 'domain':
+            if not request.user.is_superuser:    # Superusers see the full choice list
+                kwargs["queryset"] = Domain.objects.filter(
+                    created_by=request.user, powerdns_manager_dynamiczone_domain__isnull=True)
+        return super(DynamicZoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.api_key = self._get_new_api_key()
+            obj.created_by = request.user
+        obj.save()
+    
+    def _get_new_api_key(self):
+        return get_random_string(
+            length=24, allowed_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        
+admin.site.register(cache.get_model('powerdns_manager', 'DynamicZone'), DynamicZoneAdmin)
 

@@ -28,5 +28,6 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('powerdns_manager.views',
     url(r'^import/$', 'import_zone_view', name='import_zone'),
+    url(r'^update/$', 'dynamic_ip_update_view', name='dynamic_ip_update'),
 )
 
