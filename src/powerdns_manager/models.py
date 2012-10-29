@@ -89,6 +89,8 @@ class Domain(models.Model):
             return settings.PDNS_DEFAULT_RR_TTL
         else:
             return soa_rr.content.split()[-1]
+    
+    # TODO: check whether a ``updfate_serial()`` method is required
 
 signals.post_save.connect(signal_cb.rectify_zone_cb, sender=Domain)
 
