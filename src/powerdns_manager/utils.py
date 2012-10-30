@@ -527,10 +527,7 @@ def pdnssec_hash_zone_record(zone_name, record_name):
     """
     
     Domain = cache.get_model('powerdns_manager', 'Domain')
-    Record = cache.get_model('powerdns_manager', 'Record')
     DomainMetadata = cache.get_model('powerdns_manager', 'DomainMetadata')
-    CryptoKey = cache.get_model('powerdns_manager', 'CryptoKey')
-    
     
     the_domain = Domain.objects.get(name__exact=zone_name)
     nsec3param = DomainMetadata.objects.get(domain=the_domain, kind='NSEC3PARAM')
@@ -553,7 +550,7 @@ def pdnssec_hash_zone_record(zone_name, record_name):
     final_data = base64.b32encode(hashed_name)
     # Apply the translation table to convert to base32hex encoding.
     final_data = final_data.translate(b32_to_ext_hex)
-    # Return lowercase representation as required by PowerDNS
+    # Return lower case representation as required by PowerDNS
     return final_data.lower()
 
 
