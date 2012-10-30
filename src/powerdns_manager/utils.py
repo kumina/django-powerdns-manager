@@ -416,8 +416,7 @@ def rectify_zone(origin):
             # NSEC3 'Non-Narrow', 'Opt-out' mode
             for rr in zone_rr_list:
                 if rr.auth:
-                    # TODO: implement base32hex encoding
-                    rr.ordername = '_base32hex_'
+                    rr.ordername = pdnssec_hash_zone_record(rr.domain.name , rr.name)
                 else:
                     rr.ordername = None
         else:
