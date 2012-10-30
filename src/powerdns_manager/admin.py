@@ -54,6 +54,7 @@ from powerdns_manager.forms import DnskeyRecordModelForm
 from powerdns_manager.forms import KeyRecordModelForm
 from powerdns_manager.forms import NsecRecordModelForm
 from powerdns_manager.forms import RrsigRecordModelForm
+from powerdns_manager.models import zone_saved
 
 # Action for
 # - set change date
@@ -294,6 +295,29 @@ class DomainAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.save()
     
+    def save_related(self, request, form, formsets, change):
+        """Calls the signal that rectifies the zone.
+        
+        In ModelAdmin.add_view() and ModelAdmin.change_view() the method
+        save_model() is normally called before save_related().
+        
+        Using a post_save signal on the Domain or Record models is not
+        efficient. In case of the Domain model, rectify_zone() would not process
+        any new data in the associated records. In case of the Record model,
+        rectify_zone() would be called multiple times and only the last call
+        would be the effective one.
+        
+        rectify_zone() must be called after all the records and the domain have
+        been saved to the database.
+        
+        Here we execute the parent save_related() and then we call rectify zone
+        through a custom signal.
+        
+        """
+        super(DomainAdmin, self).save_related(request, form, formsets, change)
+        # Send the zone_saved signal
+        zone_saved.send(sender=self.model, origin=form.cleaned_data.get('name'))
+
 admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
 

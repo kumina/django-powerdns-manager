@@ -28,11 +28,13 @@ import time
 
 from django.db import models
 from django.db.models import signals
+import django.dispatch
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.loading import cache
 
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
+from powerdns_manager.utils import rectify_zone
 
 
 """
@@ -92,7 +94,14 @@ class Domain(models.Model):
     
     # TODO: check whether a ``updfate_serial()`` method is required
 
-signals.post_save.connect(signal_cb.rectify_zone_cb, sender=Domain)
+# ``zone_saved`` signal.
+# Sent admin.DomainAdmin.save_related() after the Domain instance and all
+# the associated Record instances have been saved.
+zone_saved = django.dispatch.Signal(providing_args=['origin'])
+
+@django.dispatch.receiver(zone_saved, sender=Domain)
+def rectify_zone_cb(sender, **kwargs):
+    rectify_zone(kwargs['origin'])
 
 
 
