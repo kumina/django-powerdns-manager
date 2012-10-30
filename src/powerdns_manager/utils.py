@@ -456,6 +456,12 @@ b32_to_ext_hex = string.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
 
 def pdnssec_hash_zone_record(zone_name, record_name):
     """
+    
+    *****
+    Special kudos to the folks at the #powerdns IRC channel for the help,
+    especially Maik for pointing me to dns.name.Name.to_digestable() method.
+    *****
+    
     NSEC3PARAM Presentation Format:
     
         http://tools.ietf.org/html/rfc5155#section-4.3
