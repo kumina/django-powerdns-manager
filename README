@@ -26,8 +26,7 @@ Features
 - Zone file import through web form (experimental)
 - Configurable enabled RR types
 - Dynamic IP updating over HTTP
-
-TODO: Add more info
+- Contains demo project for quick start and experimentation.
 
 
 License
