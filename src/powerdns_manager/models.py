@@ -33,7 +33,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.loading import cache
 
 from powerdns_manager import settings
-from powerdns_manager import signal_cb
 from powerdns_manager.utils import rectify_zone
 
 
@@ -176,9 +175,8 @@ class Record(models.Model):
         if not self.ttl:
             self.ttl = self.domain.get_minimum_ttl()
         
-        # auth and ordername fields are set automatically in
-        # ``signal_cb.rectify_zone_cb()`` signal callback, which is executed
-        # every time the Domain instance is saved.
+        # auth and ordername fields are set automatically after the zone and
+        # all records have been saved. See: admin.DomainAdmin.save_related()
         
         return super(Record, self).save(*args, **kwargs)
 
