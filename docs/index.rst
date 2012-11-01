@@ -31,7 +31,7 @@ About this guide
 
 This guide provides an introduction to the *django-powerdns-manager* |version| release,
 including instructions about how to install, configure and use it in
-Django projects or individual Django applications.
+Django projects.
 
 The contents of this documentation (the "*Documentation*") are subject to the
 *Apache License, Version 2.0* (the "*License*"); you may only use this
