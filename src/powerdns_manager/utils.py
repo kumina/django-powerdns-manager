@@ -29,12 +29,22 @@ import struct
 import hashlib
 import base64
 import string
+import StringIO
 
 import dns.zone
 from dns.zone import BadZone, NoSOA, NoNS, UnknownOrigin
 from dns.exception import DNSException
-from dns.rdataclass import *
-from dns.rdatatype import *
+import dns.rdataclass
+import dns.rdatatype
+
+import dns.rdtypes
+import dns.rdtypes.ANY
+from dns.rdtypes.ANY import *
+import dns.rdtypes.IN
+import dns.rdtypes.dsbase
+import dns.rdtypes.mxbase
+import dns.rdtypes.nsbase
+import dns.rdtypes.txtbase
 from dns.name import Name
 
 from django.db.models.loading import cache
@@ -104,9 +114,9 @@ def process_zone_file(origin, zonetext, overwrite=False):
                         ttl = rdataset.ttl
                     )
                     
-                    if rdataset.rdtype == SOA:
+                    if rdataset.rdtype == dns.rdatatype._by_text['SOA']:
                         # Set type
-                        rr.type = dns.rdatatype._by_value[SOA]  # http://www.dnspython.org/docs/1.10.0/html/dns.rdatatype-module.html#_by_value
+                        rr.type = 'SOA'
                         # Construct content
                         rr.content = '%s %s %s %s %s %s %s' % (
                             str(rdata.mname).rstrip('.'),
@@ -118,36 +128,51 @@ def process_zone_file(origin, zonetext, overwrite=False):
                             rdata.minimum
                         )
     
-                    elif rdataset.rdtype == NS:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['NS']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.NS.NS-class.html
-                        rr.type = dns.rdatatype._by_value[NS]
+                        rr.type = 'NS'
                         rr.content = str(rdata.target).rstrip('.')
     
-                    elif rdataset.rdtype == MX:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['MX']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.MX.MX-class.html
-                        rr.type = dns.rdatatype._by_value[MX]
+                        rr.type = 'MX'
                         rr.content = str(rdata.exchange).rstrip('.')
                         rr.prio = rdata.preference
                     
-                    elif rdataset.rdtype == TXT:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['TXT']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.TXT.TXT-class.html
-                        rr.type = dns.rdatatype._by_value[TXT]
+                        rr.type = 'TXT'
                         rr.content = ' '.join(rdata.strings)
                     
-                    elif rdataset.rdtype == CNAME:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['CNAME']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.CNAME.CNAME-class.html
-                        rr.type = dns.rdatatype._by_value[CNAME]
+                        rr.type = 'CNAME'
                         rr.content = str(rdata.target).rstrip('.')
                         
-                    elif rdataset.rdtype == A:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['A']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.A.A-class.html
-                        rr.type = dns.rdatatype._by_value[A]
+                        rr.type = 'A'
                         rr.content = rdata.address
                     
-                    elif rdataset.rdtype == AAAA:
+                    elif rdataset.rdtype == dns.rdatatype._by_text['AAAA']:
                         # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.AAAA.AAAA-class.html
-                        rr.type = dns.rdatatype._by_value[AAAA]
+                        rr.type = 'AAAA'
                         rr.content = rdata.address
+                    
+                    elif rdataset.rdtype == dns.rdatatype._by_text['SPF']:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.SPF.SPF-class.html
+                        rr.type = 'SPF'
+                        rr.content = ' '.join(rdata.strings)
+                    
+                    elif rdataset.rdtype == dns.rdatatype._by_text['PTR']:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.PTR.PTR-class.html
+                        rr.type = 'PTR'
+                        rr.content = str(rdata.target).rstrip('.')
+                    
+                    elif rdataset.rdtype == dns.rdatatype._by_text['SRV']:
+                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.SRV.SRV-class.html
+                        rr.type = 'SRV'
+                        rr.content = '%d %d %s' % (rdata.weight, rdata.port, str(rdata.target).rstrip('.'))
                     
                     # TODO: add support for more records
                     
@@ -169,6 +194,171 @@ def process_zone_file(origin, zonetext, overwrite=False):
         #raise Exception(str(e))
         raise Exception('The zone is malformed.')
 
+
+
+def generate_zone_file(origin):
+    """Generates a zone file.
+    
+    Accepts the zone origin as string (no trailing dot).
+     
+    Returns the contents of a zone file that contains all the resource records
+    associated with the domain with the provided origin.
+    
+    """
+    Domain = cache.get_model('powerdns_manager', 'Domain')
+    Record = cache.get_model('powerdns_manager', 'Record')
+    
+    the_domain = Domain.objects.get(name__exact=origin)
+    the_rrs = Record.objects.filter(domain=the_domain).order_by('-type')
+    
+    # Generate the zone file
+    
+    origin = origin.encode('latin1')
+    
+    # Add trailing dot to origin
+    origin = origin.rstrip('.') + '.'
+    
+    # Create an empty dns.zone object.
+    # We set check_origin=False because the zone contains no records.
+    zone = dns.zone.from_text('', origin=origin, relativize=False, check_origin=False)
+    
+    rdclass = dns.rdataclass._by_text.get('IN')
+    
+    for rr in the_rrs:
+        
+        # Add trailing dot to rr.name
+        record_name = rr.name.rstrip('.') + '.'
+        
+        if rr.type == 'SOA':
+            # Add SOA Resource Record
+            
+            # SOA content:  primary hostmaster serial refresh retry expire default_ttl
+            bits = rr.content.split()
+            # Primary nameserver of SOA record
+            primary = bits[0].rstrip('.') + '.'
+            mname = Name(primary.split('.'))
+            # Responsible hostmaster from SOA record
+            hostmaster = bits[1].rstrip('.') + '.'
+            rname = Name(hostmaster.split('.'))
+            
+            rdtype = dns.rdatatype._by_text.get('SOA')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.SOA.SOA(rdclass, rdtype,
+                mname = mname,
+                rname = rname,
+                serial = int(bits[2]),
+                refresh = int(bits[3]),
+                retry = int(bits[4]),
+                expire = int(bits[5]),
+                minimum = int(bits[6])
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'NS':
+            # Add NS Resource Record
+            rdtype = dns.rdatatype._by_text.get('NS')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.NS.NS(rdclass, rdtype,
+                target = Name((rr.content.rstrip('.') + '.').split('.'))
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'MX':
+            # Add MX Resource Record
+            rdtype = dns.rdatatype._by_text.get('MX')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.MX.MX(rdclass, rdtype,
+                preference = int(rr.prio),
+                exchange = Name((rr.content.rstrip('.') + '.').split('.'))
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'TXT':
+            # Add TXT Resource Record
+            rdtype = dns.rdatatype._by_text.get('TXT')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.TXT.TXT(rdclass, rdtype,
+                strings = rr.content.split()
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'CNAME':
+            # Add CNAME Resource Record
+            rdtype = dns.rdatatype._by_text.get('CNAME')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.CNAME.CNAME(rdclass, rdtype,
+                target = Name((rr.content.rstrip('.') + '.').split('.'))
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'A':
+            # Add A Resource Record
+            rdtype = dns.rdatatype._by_text.get('A')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.IN.A.A(rdclass, rdtype,
+                address = rr.content
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'AAAA':
+            # Add AAAA Resource Record
+            rdtype = dns.rdatatype._by_text.get('AAAA')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.IN.AAAA.AAAA(rdclass, rdtype,
+                address = rr.content
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'SPF':
+            # Add SPF Resource Record
+            rdtype = dns.rdatatype._by_text.get('SPF')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.SPF.SPF(rdclass, rdtype,
+                strings = rr.content.split()
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'PTR':
+            # Add PTR Resource Record
+            rdtype = dns.rdatatype._by_text.get('PTR')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.ANY.PTR.PTR(rdclass, rdtype,
+                target = Name((rr.content.rstrip('.') + '.').split('.'))
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+        
+        elif rr.type == 'SRV':
+            # Add SRV Resource Record
+            
+            # weight port target
+            weight, port, target = rr.content.split()
+            
+            rdtype = dns.rdatatype._by_text.get('SRV')
+            rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
+            rdata = dns.rdtypes.IN.SRV.SRV(rdclass, rdtype,
+                priority = int(rr.prio),
+                weight = int(weight),
+                port = int(port),
+                target = Name((target.rstrip('.') + '.').split('.'))
+            )
+            rdataset.add(rdata, ttl=int(rr.ttl))
+            
+    
+    # Export text (from the source code of http://www.dnspython.org/docs/1.10.0/html/dns.zone.Zone-class.html#to_file)
+    EOL = '\r\n'
+    f = StringIO.StringIO()
+    f.write('$ORIGIN %s%s' % (origin, EOL))
+    zone.to_file(f, sorted=True, relativize=False, nl=EOL)
+    data = f.getvalue()
+    f.close()
+    return data
+#    output = []
+#    names = zone.keys()
+#    names.sort()
+#    for n in names:
+#        output.append( zone[n].to_text(n, origin=zone.origin, relativize=False) )
+#    return '\r\n'.join(output)
+    
 
 
 def rectify_zone(origin):
