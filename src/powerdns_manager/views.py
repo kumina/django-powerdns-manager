@@ -44,6 +44,7 @@ from django.core.exceptions import ValidationError
 from powerdns_manager.forms import ZoneImportForm
 from powerdns_manager.forms import DynamicIPUpdateForm
 from powerdns_manager.utils import process_zone_file
+from powerdns_manager.utils import generate_zone_file
 
 
 
@@ -75,6 +76,18 @@ def import_zone_view(request):
     }
     return render_to_response(
         'powerdns_manager/import/zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+
+
+
+@login_required
+def export_zone_view(request, origin):
+    info_dict = {
+        'zone_text': generate_zone_file(origin),
+        'origin': origin,
+    }
+    return render_to_response(
+        'powerdns_manager/export/zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+
 
 
 @csrf_exempt

@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; {% trans 'Export zone file' %}
+    </div>
+{% endblock %}
+
+{% block title %}{% trans 'Zone file for' %} {{ origin }}{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'Zone file for' %} {{ origin }}</h1>
+    <p>{% trans 'The zone file has been exported successfully.' %}</p>
+    <pre>{{ zone_text }}</pre>
+{% endblock %}
