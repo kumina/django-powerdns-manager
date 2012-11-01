@@ -40,7 +40,7 @@ the *Python Package Index* (PyPI).
 Alternatively, you can clone the project's public source code repository
 and then check-out any stable release, all of which are tagged::
 
-    hg clone https://source.codetrax.org/hgroot/django-powerdns-manager
+    hg clone https://bitbucket.org/gnotaras/django-powerdns-manager
     hg tags
     hg update 0.1.0
 
@@ -65,13 +65,13 @@ source install rather than a zipped egg; django-powerdns-manager cannot be
 used from a zipped egg install.
 
 Alternatively, you can simply place the ``powerdns_manager`` directory,
-which exists under the ``src`` directory, somewhere on your Python path
+which exists under the ``src`` directory, somewhere in your Python path
 or symlink to it from somewhere on your Python path.
 
 Finally, it is also possible to install this application directly from
 the `source code repository`_ using ``pip``::
 
-    pip install -e hg+https://source.codetrax.org/hgroot/django-powerdns-manager#egg=django-powerdns-manager
+    pip install -e hg+https://bitbucket.org/gnotaras/django-powerdns-manager#egg=django-powerdns-manager
 
 The above command will install the latest development release of
 django-powerdns-manager.
@@ -79,7 +79,7 @@ django-powerdns-manager.
 To install a stable release directly from the `source code repository`_,
 for instance, the ``0.1.0`` release, run the following command::
 
-    pip install -e hg+https://source.codetrax.org/hgroot/django-powerdns-manager@0.1.0#egg=django-powerdns-manager-0.1.0
+    pip install -e hg+https://bitbucket.org/gnotaras/django-powerdns-manager@0.1.0#egg=django-powerdns-manager-0.1.0
 
 Please note that the mercurial_ source control management tool is required
 for this operation.
