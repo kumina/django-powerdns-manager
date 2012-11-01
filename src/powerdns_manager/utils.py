@@ -35,16 +35,11 @@ from dns.zone import BadZone, NoSOA, NoNS, UnknownOrigin
 from dns.exception import DNSException
 import dns.rdataclass
 import dns.rdatatype
-
 import dns.rdtypes
 import dns.rdtypes.ANY
 from dns.rdtypes.ANY import *
 import dns.rdtypes.IN
 from dns.rdtypes.IN import *
-#import dns.rdtypes.dsbase
-#import dns.rdtypes.mxbase
-#import dns.rdtypes.nsbase
-#import dns.rdtypes.txtbase
 from dns.name import Name
 
 from django.db.models.loading import cache
