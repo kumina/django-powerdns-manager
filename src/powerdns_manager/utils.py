@@ -25,7 +25,6 @@
 #
 
 import time
-import struct
 import hashlib
 import base64
 import string
