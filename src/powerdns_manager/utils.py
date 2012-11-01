@@ -41,10 +41,11 @@ import dns.rdtypes
 import dns.rdtypes.ANY
 from dns.rdtypes.ANY import *
 import dns.rdtypes.IN
-import dns.rdtypes.dsbase
-import dns.rdtypes.mxbase
-import dns.rdtypes.nsbase
-import dns.rdtypes.txtbase
+from dns.rdtypes.IN import *
+#import dns.rdtypes.dsbase
+#import dns.rdtypes.mxbase
+#import dns.rdtypes.nsbase
+#import dns.rdtypes.txtbase
 from dns.name import Name
 
 from django.db.models.loading import cache
