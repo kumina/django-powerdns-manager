@@ -51,6 +51,7 @@ Contents:
    installation
    configuration
    usage
+   quickstart
    faq
 
 
