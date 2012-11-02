@@ -91,10 +91,10 @@ class Domain(models.Model):
         else:
             return soa_rr.content.split()[-1]
     
-    # TODO: check whether a ``updfate_serial()`` method is required
+    # TODO: check whether a ``update_serial()`` method is required. Probably YES
 
 # ``zone_saved`` signal.
-# Sent admin.DomainAdmin.save_related() after the Domain instance and all
+# Sent by admin.DomainAdmin.save_related() after the Domain instance and all
 # the associated Record instances have been saved.
 zone_saved = django.dispatch.Signal(providing_args=['origin'])
 
