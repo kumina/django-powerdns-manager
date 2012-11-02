@@ -48,10 +48,10 @@ Contents:
    :maxdepth: 2
    
    introduction
+   quickstart
    installation
    configuration
    usage
-   quickstart
    faq
 
 
