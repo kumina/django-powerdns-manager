@@ -27,7 +27,7 @@
 # Scheme: <major>.<minor>.<maintenance>.<maturity>.<revision>
 # maturity: final/beta/alpha
 
-VERSION = (0, 1, 16, 'alpha', 1)
+VERSION = (0, 1, 17, 'alpha', 1)
 
 def get_version():
     version = '%s.%s' % (VERSION[0], VERSION[1])
