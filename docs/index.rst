@@ -17,7 +17,9 @@ Welcome to the *django-powerdns-manager*'s documentation!
 About this project
 ==================
 
-django-powerdns-manager is a web based PowerDNS administration panel.
+django-powerdns-manager is a web based PowerDNS_ administration panel.
+
+.. _PowerDNS: http://www.powerdns.com
 
 | **Author**: `George Notaras <http://www.g-loaded.eu/>`_
 | **Development Web Site**: `django-powerdns-manager project <http://www.codetrax.org/projects/django-powerdns-manager>`_

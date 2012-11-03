@@ -7,7 +7,9 @@ django-powerdns-manager
 | **Documentation**: `django-powerdns-manager documentation <http://packages.python.org/django-powerdns-manager>`_
 | **Downloads**: `django-powerdns-manager releases <http://pypi.python.org/pypi/django-powerdns-manager>`_
 
-django-powerdns-manager is a web based PowerDNS administration panel.
+django-powerdns-manager is a web based PowerDNS_ administration panel.
+
+.. _PowerDNS: http://www.powerdns.com
 
 Licensed under the *Apache License version 2.0*. More licensing information
 exists in the license_ section.
@@ -16,13 +18,18 @@ exists in the license_ section.
 Features
 ========
 
-- Multiuser web interface using the Django admin app.
+- Web based administration interface based on the admin Django app.
+- Easy management of all records of a zone from a signle web page.
+- Support for multiple users.
 - Database schema is DNSSEC enabled.
 - Automatic zone-rectify support using native python code.
-- Zone file import through web form (experimental)
-- Zone file export (experimental)
-- Configurable enabled RR types
-- Dynamic IP updating over HTTP
+- The application can be configured to support a user-defined subset of the
+  resource records supported by PowerDNS and customize the order in which they
+  appear in the administration panel.
+- Zone file import through web form (experimental).
+- Zone file export (experimental).
+- Support for secure updating of dynamic IP addresses in A and AAAA records
+  over HTTP.
 - Contains demo project for quick start and experimentation.
 
 
