@@ -53,6 +53,7 @@ Contents:
    configuration
    usage
    faq
+   acknowledgements
 
 
 Indices and tables
