@@ -169,8 +169,6 @@ def process_zone_file(origin, zonetext, overwrite=False):
                         rr.type = 'SRV'
                         rr.content = '%d %d %s' % (rdata.weight, rdata.port, str(rdata.target).rstrip('.'))
                     
-                    # TODO: add support for more records
-                    
                     rr.save()
         
         # Rectify zone
@@ -347,12 +345,6 @@ def generate_zone_file(origin):
     data = f.getvalue()
     f.close()
     return data
-#    output = []
-#    names = zone.keys()
-#    names.sort()
-#    for n in names:
-#        output.append( zone[n].to_text(n, origin=zone.origin, relativize=False) )
-#    return '\r\n'.join(output)
     
 
 
