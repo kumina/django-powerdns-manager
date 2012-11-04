@@ -59,6 +59,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
     *****
     
     """
+    # TODO: check what goes on with unicode
     # Does not seem to be able to process unicode, so encode data to latin1
     origin = origin.encode('latin1')
     zonetext = zonetext.encode('latin1')
@@ -206,7 +207,7 @@ def generate_zone_file(origin):
     
     # Generate the zone file
     
-    origin = origin.encode('latin1')
+    origin = origin.encode('latin1')    # TODO: check what goes on with unicode
     
     # Add trailing dot to origin
     origin = origin.rstrip('.') + '.'
