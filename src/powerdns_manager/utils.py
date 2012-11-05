@@ -632,12 +632,15 @@ b32_to_ext_hex = string.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
                                   '0123456789ABCDEFGHIJKLMNOPQRSTUV')
 
 def pdnssec_hash_zone_record(zone_name, record_name):
-    """
+    """Generates hash for ordername field in NSEC3 non-narrow mode.
     
     *****
     Special kudos to the folks at the #powerdns IRC channel for the help,
     especially Maik for pointing me to dns.name.Name.to_digestable() method.
     *****
+    
+    Notes from RFCs for easy reference
+    ----------------------------------
     
     NSEC3PARAM Presentation Format:
     
