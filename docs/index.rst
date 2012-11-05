@@ -51,6 +51,7 @@ Contents:
    
    introduction
    quickstart
+   screenshots
    installation
    configuration
    usage
