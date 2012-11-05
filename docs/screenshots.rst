@@ -37,7 +37,6 @@ Dynamic zone edit form
 .. figure:: images/dynamic-zone-edit.png
    :alt: Dynamic zone edit form
    :align: center
-   :target: _images/dynamic-zone-edit.png
    
 
 Zone export
@@ -45,7 +44,6 @@ Zone export
 .. figure:: images/zone-export.png
    :alt: Zone export
    :align: center
-   :target: _images/zone-export.png
    
 
 Zone import
