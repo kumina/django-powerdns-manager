@@ -30,6 +30,9 @@ import re
 from django import forms
 from django.db.models.loading import cache
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import validate_ipv4_address
+from django.core.validators import validate_ipv6_address
+from django.core.exceptions import ValidationError
 
 
 
@@ -223,6 +226,16 @@ class SrvRecordModelForm(BaseRecordModelForm):
 class ARecordModelForm(BaseRecordModelForm):
     """ModelForm for A resource records."""
 
+    def clean_content(self):
+        """Ensures that content is an IPv4 address."""
+        content = self.cleaned_data.get('content')
+        try:
+            validate_ipv4_address(content)
+        except ValidationError:
+            raise forms.ValidationError("""Content should contain an IPv4 address""")
+        else:
+            return content
+        
     def save(self, *args, **kwargs):
         self.instance.type = 'A'
         return super(ARecordModelForm, self).save(*args, **kwargs)
@@ -231,6 +244,16 @@ class ARecordModelForm(BaseRecordModelForm):
 class AaaaRecordModelForm(BaseRecordModelForm):
     """ModelForm for AAAA resource records."""
 
+    def clean_content(self):
+        """Ensures that content is an IPv6 address."""
+        content = self.cleaned_data.get('content')
+        try:
+            validate_ipv6_address(content)
+        except ValidationError:
+            raise forms.ValidationError("""Content should contain an IPv6 address""")
+        else:
+            return content
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'AAAA'
         return super(AaaaRecordModelForm, self).save(*args, **kwargs)
