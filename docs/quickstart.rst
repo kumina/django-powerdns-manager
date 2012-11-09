@@ -84,10 +84,14 @@ Populate the database
 First, populate the Django project's database::
 
     python manage.py syncdb
-    
+
 You will be prompted to create a superuser. Create this user and take a note
 of the username and password as this is what you will use to log into the
 web based administration interface.
+
+Finally, populate the dedicated django-powerdns-manager database::
+
+    python manage.py syncdb --database=powerdns
 
 
 Start the PowerDNS server
