@@ -28,6 +28,7 @@ Features
   appear in the administration panel.
 - Zone file import through web form (experimental).
 - Zone file export (experimental).
+- Command-line interfaces to import and export zones in bulk (experimental).
 - Support for secure updating of dynamic IP addresses in A and AAAA records
   over HTTP.
 - Supports using a dedicated database to store the tables needed by PowerDNS.
