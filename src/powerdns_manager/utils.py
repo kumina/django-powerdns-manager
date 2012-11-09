@@ -80,7 +80,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
         
         # Check if zone already exists in the database.
         try:
-            domain_instance = Domain.objects.get(name=origin)
+            domain_instance = Domain.objects.get(name=str(zone.origin).rstrip('.'))
         except Domain.DoesNotExist:
             pass    # proceed with importing the new zone data
         else:   # Zone exists
@@ -88,7 +88,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
                 # If ``overwrite`` has been checked, then delete the current zone.
                 domain_instance.delete()
             else:
-                raise Exception('Zone already exists. If you wish to replace it with the imported one, check the <em>Overwrite</em> option in the import form.')
+                raise Exception('Zone already exists. Consider using the "overwrite" option')
         
         # Import the new zone data to the database.
         
@@ -180,16 +180,16 @@ def process_zone_file(origin, zonetext, overwrite=False):
                     
 
     except NoSOA:
-        raise Exception('The zone has no SOA RR at its origin.')
+        raise Exception('The zone has no SOA RR at its origin')
     except NoNS:
-        raise Exception('The zone has no NS RRset at its origin.')
+        raise Exception('The zone has no NS RRset at its origin')
     except UnknownOrigin:
-        raise Exception('The zone\'s origin is unknown.')
+        raise Exception('The zone\'s origin is unknown')
     except BadZone:
-        raise Exception('The zone is malformed.')
+        raise Exception('The zone is malformed')
     except DNSException, e:
         #raise Exception(str(e))
-        raise Exception('The zone is malformed.')
+        raise Exception('The zone is malformed')
 
 
 
