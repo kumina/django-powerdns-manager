@@ -21,6 +21,71 @@ In the Django project's ``settings`` module, add ``powerdns_manager`` to the
     )
 
 
+Using a dedicated database for your DNS server
+==============================================
+
+It is highly recommended to configure django-powerdns-manager to use a
+different database than the rest of the apps of the Django project for
+security and performance reasons.
+
+The ``PowerdnsManagerDbRouter`` database router is provided for this
+purpose. All you need to do, is configure an **extra database** in
+``settings.py`` named ``powerdns`` and add this router to the
+``DATABASE_ROUTERS`` list.
+
+The following example assumes using SQLite databases, but your are free to
+use any database backend you want, provided that it is also supported by
+the PowerDNS server software::
+
+    DATABASES = {
+        'default': {    # Used by all apps of the Django project except django-powerdns-manager
+            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'main.db',               # Or path to database file if using sqlite3.
+            'USER': '',                      # Not used with sqlite3.
+            'PASSWORD': '',                  # Not used with sqlite3.
+            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        },
+        'powerdns': {    # Used by django-powerdns-manager and PowerDNS server
+            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'powerdns.db',           # Or path to database file if using sqlite3.
+            'USER': '',                      # Not used with sqlite3.
+            'PASSWORD': '',                  # Not used with sqlite3.
+            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
+
+    DATABASE_ROUTERS = ['powerdns_manager.routers.PowerdnsManagerDbRouter']
+
+The configuration above indicates that ``main.db`` will be used by all
+the apps of the Django project, except ``django-powerdns-manager``. The
+``powerdns.db`` database will **only** be used by ``django-powerdns-manager``.
+
+PowerDNS should also be configured to send queries to ``powerdns.db``.
+
+
+Synchronize the project databases
+---------------------------------
+
+Finally, synchronize the project's databases using the following command::
+
+    python manage.py syncdb
+    python manage.py syncdb --database=powerdns
+
+
+URLS
+====
+
+Add the ``powerdns_manager`` specific URL patterns to the ``urls.py`` file of
+your project::
+
+    # URLs for powerdns_manager
+    urlpatterns += patterns('',
+        url('^powerdns/', include('powerdns_manager.urls')),
+    )
+
+
 Settings reference 
 ==================
 
@@ -79,23 +144,4 @@ module to customize the functionality of *django-powerdns-manager*.
 
 .. _supports: http://doc.powerdns.com/types.html
 
-
-URLS
-====
-
-Add the ``powerdns_manager`` specific URL patterns to the ``urls.py`` file of
-your project::
-
-    # URLs for powerdns_manager
-    urlpatterns += patterns('',
-        url('^powerdns/', include('powerdns_manager.urls')),
-    )
-
-
-Synchronize the project database
-================================
-
-Finally, synchronize the project's database using the following command::
-
-    python manage.py syncdb
 
