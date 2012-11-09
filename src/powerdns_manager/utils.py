@@ -61,7 +61,10 @@ def process_zone_file(origin, zonetext, overwrite=False):
     """
     # TODO: check what goes on with unicode
     # Does not seem to be able to process unicode, so encode data to latin1
-    origin = origin.encode('latin1')
+    if origin:
+        origin = origin.encode('latin1')
+    else:
+        origin = None
     zonetext = zonetext.encode('latin1')
     zonetext = zonetext.replace('\r\n', '\n')
     
