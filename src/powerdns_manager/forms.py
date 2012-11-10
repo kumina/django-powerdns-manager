@@ -216,12 +216,39 @@ class MxRecordModelForm(BaseRecordModelForm):
 
 
 class SrvRecordModelForm(BaseRecordModelForm):
-    """ModelForm for SRV resource records."""
+    """ModelForm for SRV resource records.
+    
+    For details see docstrings in SoaRecordModelForm.
+    
+    """
 
+    weight = forms.IntegerField(min_value=1, required=True, label=_('weight'), widget=forms.TextInput(attrs={'size': '3'}), help_text="""A relative weight for records with the same priority.""")
+    port = forms.IntegerField(min_value=1, max_value=65535, required=True, label=_('port'), widget=forms.TextInput(attrs={'size': '5'}), help_text="""The TCP or UDP port on which the service is to be found.""")
+    target = forms.CharField(max_length=128, required=True, label=_('target'), widget=forms.TextInput(attrs={'size': '25'}), help_text="""The canonical hostname of the machine providing the service (no trailing dot).""")
+    
+    def __init__(self, *args, **kwargs):
+        """Set initial values for extra ModelForm fields."""
+        if kwargs.has_key('instance'):
+            instance = kwargs['instance']
+            if instance.pk is not None:    # This check asserts that this is an EDIT
+                if instance.type == 'SRV':
+                    bits = instance.content.split()
+                    kwargs['initial'] = {
+                        'weight': bits[0],
+                        'port': bits[1],
+                        'target': bits[2],
+                    }
+        super(SrvRecordModelForm, self).__init__(*args, **kwargs)
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'SRV'
+        self.instance.content = '%d %d %s' % (
+            self.cleaned_data.get('weight'),
+            self.cleaned_data.get('port'),
+            self.cleaned_data.get('target'),
+        )
         return super(SrvRecordModelForm, self).save(*args, **kwargs)
-    
+
 
 class ARecordModelForm(BaseRecordModelForm):
     """ModelForm for A resource records."""
@@ -235,7 +262,7 @@ class ARecordModelForm(BaseRecordModelForm):
             raise forms.ValidationError("""Content should contain an IPv4 address""")
         else:
             return content
-        
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'A'
         return super(ARecordModelForm, self).save(*args, **kwargs)

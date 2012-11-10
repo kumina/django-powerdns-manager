@@ -118,7 +118,7 @@ class MxRecordInline(BaseTabularRecordInline):
 class SrvRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'SRV'
     form = SrvRecordModelForm
-    fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
+    fields = ('name', 'ttl', 'prio', 'weight', 'port', 'target', 'date_modified')
 
 class ARecordInline(BaseTabularRecordInline):
     RR_TYPE = 'A'
