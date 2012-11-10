@@ -1,0 +1,310 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-10 14:15+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: .\forms.py:102
+msgid "primary nameserver"
+msgstr ""
+
+#: .\forms.py:103
+msgid "hostmaster mailbox"
+msgstr ""
+
+#: .\forms.py:104
+msgid "serial"
+msgstr ""
+
+#: .\forms.py:105
+msgid "refresh"
+msgstr ""
+
+#: .\forms.py:106
+msgid "retry"
+msgstr ""
+
+#: .\forms.py:107
+msgid "expire"
+msgstr ""
+
+#: .\forms.py:108
+msgid "minimum TTL"
+msgstr ""
+
+#: .\forms.py:395 .\templates\powerdns_manager\import\zone.html.py:36
+msgid "Origin"
+msgstr ""
+
+#: .\forms.py:396
+msgid "Zone file"
+msgstr ""
+
+#: .\forms.py:397 .\templates\powerdns_manager\import\zone.html.py:46
+msgid "Overwrite"
+msgstr ""
+
+#: .\models.py:54 .\models.py:125 .\models.py:298
+msgid "name"
+msgstr ""
+
+#: .\models.py:55
+msgid "master"
+msgstr ""
+
+#: .\models.py:56
+msgid "last check"
+msgstr ""
+
+#: .\models.py:57 .\models.py:127
+msgid "type"
+msgstr ""
+
+#: .\models.py:58
+msgid "notified serial"
+msgstr ""
+
+#: .\models.py:59 .\models.py:206
+msgid "account"
+msgstr ""
+
+#: .\models.py:63 .\models.py:139 .\models.py:209 .\models.py:247
+#: .\models.py:274 .\models.py:303 .\models.py:336
+msgid "Last Modified"
+msgstr ""
+
+#: .\models.py:64 .\models.py:304 .\models.py:337
+msgid "created by"
+msgstr ""
+
+#: .\models.py:68
+msgid "zone"
+msgstr ""
+
+#: .\models.py:69
+msgid "zones"
+msgstr ""
+
+#: .\models.py:124 .\models.py:242 .\models.py:267 .\models.py:332
+msgid "domain"
+msgstr ""
+
+#: .\models.py:124 .\models.py:242 .\models.py:267
+msgid "Select the domain this record belongs to."
+msgstr ""
+
+#: .\models.py:128 .\models.py:244 .\models.py:271
+msgid "content"
+msgstr ""
+
+#: .\models.py:129
+msgid "TTL"
+msgstr ""
+
+#: .\models.py:130
+msgid "priority"
+msgstr ""
+
+#: .\models.py:132
+msgid "authoritative"
+msgstr ""
+
+#: .\models.py:133
+msgid "ordername"
+msgstr ""
+
+#: .\models.py:136
+msgid "change date"
+msgstr ""
+
+#: .\models.py:143
+msgid "record"
+msgstr ""
+
+#: .\models.py:144
+msgid "records"
+msgstr ""
+
+#: .\models.py:203
+msgid "IP address"
+msgstr ""
+
+#: .\models.py:205
+msgid "nameserver"
+msgstr ""
+
+#: .\models.py:213
+msgid "supermaster"
+msgstr ""
+
+#: .\models.py:214
+msgid "supermasters"
+msgstr ""
+
+#: .\models.py:243
+msgid "setting"
+msgstr ""
+
+#: .\models.py:251 .\models.py:252
+msgid "domain metadata"
+msgstr ""
+
+#: .\models.py:268
+msgid "flags"
+msgstr ""
+
+#: .\models.py:269
+msgid "active"
+msgstr ""
+
+#: .\models.py:278
+msgid "crypto key"
+msgstr ""
+
+#: .\models.py:279
+msgid "crypto keys"
+msgstr ""
+
+#: .\models.py:299
+msgid "algorithm"
+msgstr ""
+
+#: .\models.py:300
+msgid "secret"
+msgstr ""
+
+#: .\models.py:309
+msgid "TSIG Key"
+msgstr ""
+
+#: .\models.py:310
+msgid "TSIG Keys"
+msgstr ""
+
+#: .\models.py:332
+msgid ""
+"Select the domain, the A and AAAA records of which might be updated "
+"dynamically over HTTP."
+msgstr ""
+
+#: .\models.py:333
+msgid "API Key"
+msgstr ""
+
+#: .\models.py:335
+msgid "Created on"
+msgstr ""
+
+#: .\models.py:340
+msgid "dynamic zone"
+msgstr ""
+
+#: .\models.py:341
+msgid "dynamic zones"
+msgstr ""
+
+#: .\templates\powerdns_manager\export\zone.html.py:7
+#: .\templates\powerdns_manager\import\error.html.py:7
+#: .\templates\powerdns_manager\import\success.html.py:7
+#: .\templates\powerdns_manager\import\zone.html.py:11
+msgid "Home"
+msgstr ""
+
+#: .\templates\powerdns_manager\export\zone.html.py:8
+msgid "Export zone file"
+msgstr ""
+
+#: .\templates\powerdns_manager\export\zone.html.py:12
+#: .\templates\powerdns_manager\export\zone.html.py:15
+msgid "Zone file for"
+msgstr ""
+
+#: .\templates\powerdns_manager\export\zone.html.py:16
+msgid "The zone file has been exported successfully."
+msgstr ""
+
+#: .\templates\powerdns_manager\import\error.html.py:8
+#: .\templates\powerdns_manager\import\success.html.py:8
+#: .\templates\powerdns_manager\import\zone.html.py:12
+msgid "Import zone file"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\error.html.py:12
+#: .\templates\powerdns_manager\import\error.html.py:15
+msgid "Error"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\error.html.py:17
+msgid ""
+"Please use your browser\\'s <em>Back</em> button to return to the zone "
+"import form."
+msgstr ""
+
+#: .\templates\powerdns_manager\import\success.html.py:12
+#: .\templates\powerdns_manager\import\success.html.py:15
+msgid "Zone import successful"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\success.html.py:16
+msgid "The zone file has been imported successfully. Import "
+msgstr ""
+
+#: .\templates\powerdns_manager\import\success.html.py:16
+msgid "another zone"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:7
+msgid "Import zone file to PowerDNS Manager"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:23
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:27
+msgid "Import Zone File"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:28
+msgid ""
+"This web form facilitates importing zone files to PowerDNS Manager by "
+"pasting the zone file data in the textarea below."
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:29
+msgid ""
+"The origin field is optional. It should be filled in case this information "
+"is not available in your zone file either by the $ORIGIN directive or by "
+"using an FQDN in the name field of each record."
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:30
+msgid ""
+"By checking ``overwrite``, if a zone with the same origin exists in your "
+"database will be deleted and replaced by the imported one. Proceed with "
+"caution."
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:41
+msgid "Zone file text"
+msgstr ""
+
+#: .\templates\powerdns_manager\import\zone.html.py:52
+msgid "Import zone"
+msgstr ""
