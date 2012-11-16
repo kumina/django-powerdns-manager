@@ -56,14 +56,6 @@ from powerdns_manager.forms import NsecRecordModelForm
 from powerdns_manager.forms import RrsigRecordModelForm
 from powerdns_manager.models import zone_saved
 
-# Action for
-# - set change date
-# - set serial (?)
-# - set TTL to 300, 3600, 86400
-#
-#def test_action(modeladmin, request, queryset):
-#    messages.add_message(request, messages.INFO, 'The test action was successful.')
-#test_action.short_description = "Test Action"
 
 
 class BaseTabularRecordInline(admin.TabularInline):
