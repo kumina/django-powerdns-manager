@@ -473,3 +473,10 @@ class DynamicIPUpdateForm(forms.Form):
         return hostname
         
    
+
+class ZoneTypeSelectionForm(forms.Form):
+    """This form is used in intermediate page that sets the zone type in bulk."""
+    from powerdns_manager.models import Domain
+    domaintype = forms.ChoiceField(choices=Domain.DOMAIN_TYPE_CHOICES, required=True, label=_('Zone type'), help_text="""Select the zone type. Native refers to native SQL replication. Master/Slave refers to DNS server based zone transfers.""")
+
+
