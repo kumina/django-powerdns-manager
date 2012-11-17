@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n static %}
+{% load url from future %}
+{% load admin_urls %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />{% endblock %}
+
+{% block breadcrumbs %}
+	<div class="breadcrumbs">
+		<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+		&rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst|escape }}</a>
+		&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+		&rsaquo; {% trans 'Set type for selected zones' %}
+	</div>
+{% endblock %}
+
+{% block title %}{% trans 'Set zone type' %}{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        
+        <form action="" method="post">{% csrf_token %}
+        <div>
+            {% if form.errors %}
+                <p class="errornote">
+                {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+                </p>
+            {% endif %}
+
+            <h1>{% trans 'Set zone type' %}</h1>
+            <p>{% trans "Select the new zone type from the drop down menu." %}</p>
+            
+            <fieldset class="module aligned">
+    
+                <div class="form-row">
+                    {{ form.domaintype.errors }}
+                    <label for="id_domaintype" class="">{% trans 'Zone type' %}:</label>{{ form.domaintype }}
+                </div>
+
+            </fieldset>
+
+            {% for obj in queryset %}
+                <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+            {% endfor %}
+            <input type="hidden" name="action" value="set_domain_type_bulk" />
+            <input type="hidden" name="post" value="yes" />
+            
+            <div class="submit-row">
+                <input type="submit" value="{% trans 'Save' %}" class="default" />
+            </div>
+
+            <script type="text/javascript">document.getElementById("id_domaintype").focus();</script>
+        </div>
+        </form>
+
+    </div> <!-- content-main -->
+{% endblock %}
