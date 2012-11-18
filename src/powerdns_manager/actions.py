@@ -62,6 +62,10 @@ def set_domain_type_bulk(modeladmin, request, queryset):
     
     Based on: https://github.com/django/django/blob/1.4.2/django/contrib/admin/actions.py
     
+    Important
+    ---------
+    In order to work requires some special form fields (see the template).
+    
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label
@@ -98,21 +102,3 @@ def set_domain_type_bulk(modeladmin, request, queryset):
     return render_to_response(
         'powerdns_manager/actions/set_domain_type.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
     
-
-    # Display the confirmation page
-#    return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
-#        "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
-#        "admin/%s/delete_selected_confirmation.html" % app_label,
-#        "admin/delete_selected_confirmation.html"
-#    ], context, current_app=modeladmin.admin_site.name)
-#    
-#    
-#        selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
-#        ct = ContentType.objects.get_for_model(queryset.model)
-#        return HttpResponseRedirect("/export/?ct=%s&ids=%s" % (ct.pk, ",".join(selected)))
-#    action_set_domain_type_bulk.short_description = "Set domain type"
-
-
-
-
-

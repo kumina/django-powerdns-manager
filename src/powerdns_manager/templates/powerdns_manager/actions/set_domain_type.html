@@ -39,6 +39,8 @@
 
             </fieldset>
 
+            {# Special Fields #}
+            {# These are needed for the action code to work. This an undocumented Django feature #}
             {% for obj in queryset %}
                 <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
             {% endfor %}
