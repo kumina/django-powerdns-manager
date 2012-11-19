@@ -90,6 +90,31 @@ class Domain(models.Model):
         else:
             return soa_rr.content.split()[-1]
     
+    def set_minimum_ttl(self, new_minimum_ttl):
+        """Sets the minimum TTL.
+        
+        Accepts ``new_minimum_ttl`` (integer)
+        
+        SOA content:  primary hostmaster serial refresh retry expire default_ttl
+        
+        Important
+        ---------
+        Make sure this is not called while the SOA record object is modified.
+        
+        TODO: Investigate whether it is needed to perform any checks against settings.PDNS_DEFAULT_RR_TTL
+        
+        """
+        Record = cache.get_model('powerdns_manager', 'Record')
+        try:
+            soa_rr = Record.objects.get(domain=self, type='SOA')
+        except Record.DoesNotExist:
+            raise Exception('SOA Resource Record does not exist.')
+        else:
+            bits = soa_rr.content.split()
+            bits[6] = new_minimum_ttl
+            soa_rr.content = ' '.join(bits)
+            soa_rr.save()
+    
     def update_serial(self):
         """Updates the serial of the zone (SOA record).
         
@@ -100,7 +125,7 @@ class Domain(models.Model):
         try:
             soa_rr = Record.objects.get(domain=self, type='SOA')
         except Record.DoesNotExist:
-            raise Exception('Programming Error')
+            raise Exception('SOA Resource Record does not exist.')
         else:
             bits = soa_rr.content.split()
             bits[2] = str(generate_serial())
