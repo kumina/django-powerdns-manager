@@ -183,6 +183,9 @@ def process_zone_file(origin, zonetext, overwrite=False):
                     
                     rr.save()
         
+        # Update zone serial
+        the_domain.update_serial()
+        
         # Rectify zone
         rectify_zone(the_domain.name)
                     

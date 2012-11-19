@@ -88,6 +88,7 @@ def set_domain_type_bulk(modeladmin, request, queryset):
         if n and domain_type:
             for obj in queryset:
                 obj.type = domain_type
+                obj.update_serial()
                 obj.save()
                 obj_display = force_unicode(obj)
                 modeladmin.log_change(request, obj, obj_display)
@@ -176,6 +177,10 @@ def set_ttl_bulk(modeladmin, request, queryset):
                         rr.save()
                         rr_display = force_unicode(rr)
                         modeladmin.log_change(request, rr, rr_display)
+                    
+                    # Update the domain serial
+                    domain_obj.update_serial()
+                    
                     record_count += len(qs)
                 messages.info(request, 'Successfully updated %d zones (%d total records).' % (n, record_count))
             # Return None to display the change list page again.
