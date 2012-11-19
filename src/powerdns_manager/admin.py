@@ -57,6 +57,7 @@ from powerdns_manager.forms import RrsigRecordModelForm
 from powerdns_manager.signal_cb import zone_saved
 from powerdns_manager.actions import set_domain_type_bulk
 from powerdns_manager.actions import set_ttl_bulk
+from powerdns_manager.actions import force_serial_update
 
 
 
@@ -236,7 +237,7 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
-    actions = [set_domain_type_bulk, set_ttl_bulk]
+    actions = [set_domain_type_bulk, set_ttl_bulk, force_serial_update]
     change_list_template = 'powerdns_manager/domain_changelist.html'
     
     #
