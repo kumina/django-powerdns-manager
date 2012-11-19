@@ -237,6 +237,7 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name_plural = 'zones'
     save_on_top = True
     actions = [set_domain_type_bulk, set_ttl_bulk]
+    change_list_template = 'powerdns_manager/domain_changelist.html'
     
     #
     # Build the ``inlines`` list. Only inlines for enabled RR types are included.
