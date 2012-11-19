@@ -56,6 +56,8 @@ from powerdns_manager.forms import NsecRecordModelForm
 from powerdns_manager.forms import RrsigRecordModelForm
 from powerdns_manager.models import zone_saved
 from powerdns_manager.actions import set_domain_type_bulk
+from powerdns_manager.actions import set_ttl_bulk
+
 
 
 class BaseTabularRecordInline(admin.TabularInline):
@@ -234,7 +236,7 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
-    actions = [set_domain_type_bulk, ]
+    actions = [set_domain_type_bulk, set_ttl_bulk]
     
     #
     # Build the ``inlines`` list. Only inlines for enabled RR types are included.

@@ -34,6 +34,8 @@ from django.core.validators import validate_ipv4_address
 from django.core.validators import validate_ipv6_address
 from django.core.exceptions import ValidationError
 
+from powerdns_manager import settings
+
 
 
 class BaseRecordModelForm(forms.ModelForm):
@@ -478,5 +480,12 @@ class ZoneTypeSelectionForm(forms.Form):
     """This form is used in intermediate page that sets the zone type in bulk."""
     from powerdns_manager.models import Domain
     domaintype = forms.ChoiceField(choices=Domain.DOMAIN_TYPE_CHOICES, required=True, label=_('Zone type'), help_text="""Select the zone type. Native refers to native SQL replication. Master/Slave refers to DNS server based zone transfers.""")
+
+
+
+class TtlSelectionForm(forms.Form):
+    """This form is used in intermediate page that sets the RR TTL in bulk."""
+    new_ttl = forms.IntegerField(min_value=settings.PDNS_DEFAULT_RR_TTL, required=True, label=_('New TTL'), help_text="""Enter the new Time-To-Live (TTL) in seconds.""")
+    reset_zone_minimum = forms.BooleanField(required=False, label=_('Reset minimum TTL of the zones?'), help_text="""If checked, the minimum TTL of the selected zones will be reset to the new TTL value.""")
 
 
