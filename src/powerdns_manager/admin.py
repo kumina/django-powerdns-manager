@@ -54,7 +54,7 @@ from powerdns_manager.forms import DnskeyRecordModelForm
 from powerdns_manager.forms import KeyRecordModelForm
 from powerdns_manager.forms import NsecRecordModelForm
 from powerdns_manager.forms import RrsigRecordModelForm
-from powerdns_manager.models import zone_saved
+from powerdns_manager.signal_cb import zone_saved
 from powerdns_manager.actions import set_domain_type_bulk
 from powerdns_manager.actions import set_ttl_bulk
 
