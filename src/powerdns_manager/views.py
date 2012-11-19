@@ -42,8 +42,10 @@ from django.core.validators import validate_ipv6_address
 from django.core.exceptions import ValidationError
 
 from powerdns_manager.forms import ZoneImportForm
+from powerdns_manager.forms import AxfrImportForm
 from powerdns_manager.forms import DynamicIPUpdateForm
 from powerdns_manager.utils import process_zone_file
+from powerdns_manager.utils import process_axfr_response
 from powerdns_manager.utils import generate_zone_file
 
 
@@ -76,6 +78,38 @@ def import_zone_view(request):
     }
     return render_to_response(
         'powerdns_manager/import/zone.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+
+
+
+@login_required
+@csrf_protect
+def import_axfr_view(request):
+    if request.method == 'POST':
+        form = AxfrImportForm(request.POST)
+        if form.is_valid():
+            origin = form.cleaned_data['origin']
+            nameserver = form.cleaned_data['nameserver']
+            overwrite = form.cleaned_data['overwrite']
+            
+            try:
+                process_axfr_response(origin, nameserver, overwrite)
+            except Exception, e:
+                info_dict = {
+                    'strerror': mark_safe(str(e)),
+                }
+                return render_to_response('powerdns_manager/import/error.html', {}, mimetype='text/html')
+            info_dict = {'is_axfr': True}
+            return render_to_response('powerdns_manager/import/success.html', info_dict, mimetype='text/html')
+            
+    else:
+        form = AxfrImportForm() # An unbound form
+
+    info_dict = {
+        'form': form,
+    }
+    return render_to_response(
+        'powerdns_manager/import/axfr.html', info_dict, context_instance=RequestContext(request), mimetype='text/html')
+
 
 
 
