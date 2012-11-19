@@ -27,7 +27,8 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('powerdns_manager.views',
-    url(r'^import/$', 'import_zone_view', name='import_zone'),
+    url(r'^import/zonefile/$', 'import_zone_view', name='import_zone'),
+    url(r'^import/axfr/$', 'import_axfr_view', name='import_axfr'),
     url(r'^export/(?P<origin>[.\-_\w]+)/$', 'export_zone_view', name='export_zone'),
     url(r'^update/$', 'dynamic_ip_update_view', name='dynamic_ip_update'),
 )
