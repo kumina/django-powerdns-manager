@@ -46,6 +46,15 @@ from django.db.models.loading import cache
 
 
 
+def generate_serial(old_serial=None, is_timestamp=True):
+    """Generates a new serial for the zone.
+    
+    Currently returns the Unix timestamp.
+    
+    """
+    return int(time.time()) 
+
+
 def process_zone_file(origin, zonetext, overwrite=False):
     """Imports zone to the database.
     

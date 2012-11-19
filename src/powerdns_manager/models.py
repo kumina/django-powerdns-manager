@@ -24,8 +24,6 @@
 #  limitations under the License.
 #
 
-import time
-
 from django.db import models
 from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
@@ -33,6 +31,7 @@ from django.db.models.loading import cache
 
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
+from powerdns_manager.utils import generate_serial
 
 
 
@@ -91,8 +90,23 @@ class Domain(models.Model):
         else:
             return soa_rr.content.split()[-1]
     
-    # TODO: check whether a ``update_serial()`` method is required. Probably YES
-
+    def update_serial(self):
+        """Updates the serial of the zone (SOA record).
+        
+        SOA content:  primary hostmaster serial refresh retry expire default_ttl
+        
+        """
+        Record = cache.get_model('powerdns_manager', 'Record')
+        try:
+            soa_rr = Record.objects.get(domain=self, type='SOA')
+        except Record.DoesNotExist:
+            raise Exception('Programming Error')
+        else:
+            bits = soa_rr.content.split()
+            bits[2] = str(generate_serial())
+            soa_rr.content = ' '.join(bits)
+            soa_rr.save()
+    
 signal_cb.zone_saved.connect(signal_cb.rectify_zone_cb, sender=Domain)
 
 
@@ -163,7 +177,7 @@ class Record(models.Model):
         4) Set the ``ordername`` field. Needed by PowerDNS internals.
         
         """
-        self.change_date = int(time.time())
+        self.change_date = generate_serial()
         
         if not self.ttl:
             self.ttl = self.domain.get_minimum_ttl()
