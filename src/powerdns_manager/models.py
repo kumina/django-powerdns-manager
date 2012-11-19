@@ -72,6 +72,15 @@ class Domain(models.Model):
     def __unicode__(self):
         return self.name
     
+#    def save(self, *args, **kwargs):
+#        """Saves the instance to the database.
+#        
+#        The serial of the zone is updated.
+#        
+#        """
+#        self.update_serial()
+#        return super(Domain, self).save(*args, **kwargs)
+    
     def get_minimum_ttl(self):
         """Returns the minimum TTL.
         
