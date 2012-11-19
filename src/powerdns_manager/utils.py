@@ -101,14 +101,14 @@ def process_axfr_response(origin, nameserver, overwrite=False):
     """
     origin = Name((origin.rstrip('.') + '.').split('.'))
     axfr_query = dns.query.xfr(nameserver, origin, timeout=5, relativize=False, lifetime=10)
-    
+
     try:
         zone = dns.zone.from_xfr(axfr_query, relativize=False)
         if not str(zone.origin).rstrip('.'):
             raise UnknownOrigin
         
         process_and_import_zone_data(zone, overwrite)
-        
+
     except NoSOA:
         raise Exception('The zone has no SOA RR at its origin')
     except NoNS:
@@ -118,8 +118,9 @@ def process_axfr_response(origin, nameserver, overwrite=False):
     except BadZone:
         raise Exception('The zone is malformed')
     except DNSException, e:
-        #raise Exception(str(e))
-        raise Exception('The zone is malformed')
+        if not str(e):
+            raise Exception('Transfer Failed')
+        raise Exception(str(e))
     
 
 def process_and_import_zone_data(zone, overwrite=False):
