@@ -13,5 +13,11 @@
 
 {% block content %}
 	<h1>{% trans 'Zone import successful' %}</h1>
-	<p>{% trans 'The zone file has been imported successfully. Import ' %}<a href="{% url 'import_zone' %}">{% trans 'another zone' %}</a>.</p>
+	<p>{% trans 'The zone file has been imported successfully. Import ' %}
+	{% if is_axfr %}
+	    <a href="{% url 'import_axfr' %}">{% trans 'another zone' %}</a>
+	{% else %}
+	    <a href="{% url 'import_zone' %}">{% trans 'another zone' %}</a>
+	{% endif %}
+	.</p>
 {% endblock %}
