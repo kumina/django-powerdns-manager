@@ -426,6 +426,15 @@ class ZoneImportForm(forms.Form):
     overwrite = forms.BooleanField(required=False, label=_('Overwrite'), help_text="""If checked, existing zone will be replaced by this one. Proceed with caution.""")
 
 
+class AxfrImportForm(forms.Form):
+    """This form is used to import zone data from AXFR responses through the
+    ``import_axfr_view``.
+    
+    """
+    origin = forms.CharField(max_length=128, initial='', required=True, label=_('Origin'), help_text="""Enter the domain name to import.""")
+    nameserver = forms.GenericIPAddressField(protocol='both', required=True, label=_('Nameserver IP'), help_text="""Enter the IP address (IPv4 or IPv6 of the nameserver that contains zone information.""")
+    overwrite = forms.BooleanField(required=False, label=_('Overwrite'), help_text="""If checked, existing zone will be replaced by this one. Proceed with caution.""")
+
 
 class DynamicIPUpdateForm(forms.Form):
     """This form is used to validate the supplied data in the POST request.
