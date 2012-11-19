@@ -31,6 +31,7 @@ import string
 import StringIO
 
 import dns.zone
+import dns.query
 from dns.zone import BadZone, NoSOA, NoNS, UnknownOrigin
 from dns.exception import DNSException
 import dns.rdataclass
@@ -61,11 +62,7 @@ def process_zone_file(origin, zonetext, overwrite=False):
     No checks for existence are performed in this file. For form processing,
     see the ``import_zone_view`` view.
     
-    *****
-    Special kudos to Grig Gheorghiu for demonstrating how to manage zone files
-    using dnspython in the following article:
-    http://agiletesting.blogspot.com/2005/08/managing-dns-zone-files-with-dnspython.html
-    *****
+
     
     """
     if origin:
@@ -76,120 +73,13 @@ def process_zone_file(origin, zonetext, overwrite=False):
     zonetext = str(zonetext)
     zonetext = zonetext.replace('\r\n', '\n')
     
-    Domain = cache.get_model('powerdns_manager', 'Domain')
-    Record = cache.get_model('powerdns_manager', 'Record')
-    
     try:
         zone = dns.zone.from_text(zonetext, origin=origin, relativize=False)
         if not str(zone.origin).rstrip('.'):
             raise UnknownOrigin
         
-        # New zone data is now available
+        process_and_import_zone_data(zone, overwrite)
         
-        # Check if zone already exists in the database.
-        try:
-            domain_instance = Domain.objects.get(name=str(zone.origin).rstrip('.'))
-        except Domain.DoesNotExist:
-            pass    # proceed with importing the new zone data
-        else:   # Zone exists
-            if overwrite:
-                # If ``overwrite`` has been checked, then delete the current zone.
-                domain_instance.delete()
-            else:
-                raise Exception('Zone already exists. Consider using the "overwrite" option')
-        
-        # Import the new zone data to the database.
-        
-        # Create a domain instance
-        the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE', master='')
-        
-        # Create RRs
-        for name, node in zone.nodes.items():
-            rdatasets = node.rdatasets
-            
-            for rdataset in rdatasets:
-                
-                # Check instance variables of types:
-                # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes-module.html
-    
-                for rdata in rdataset:
-                    
-                    rr = Record(
-                        domain=the_domain,
-                        name=str(name).rstrip('.'), # name is the dnspython node name
-                        change_date=int(time.time()),
-                        ttl = rdataset.ttl
-                    )
-                    
-                    if rdataset.rdtype == dns.rdatatype._by_text['SOA']:
-                        # Set type
-                        rr.type = 'SOA'
-                        # Construct content
-                        rr.content = '%s %s %s %s %s %s %s' % (
-                            str(rdata.mname).rstrip('.'),
-                            str(rdata.rname).rstrip('.'),
-                            rdata.serial,
-                            rdata.refresh,
-                            rdata.retry,
-                            rdata.expire,
-                            rdata.minimum
-                        )
-    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['NS']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.NS.NS-class.html
-                        rr.type = 'NS'
-                        rr.content = str(rdata.target).rstrip('.')
-    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['MX']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.MX.MX-class.html
-                        rr.type = 'MX'
-                        rr.content = str(rdata.exchange).rstrip('.')
-                        rr.prio = rdata.preference
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['TXT']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.TXT.TXT-class.html
-                        rr.type = 'TXT'
-                        rr.content = ' '.join(rdata.strings)
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['CNAME']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.CNAME.CNAME-class.html
-                        rr.type = 'CNAME'
-                        rr.content = str(rdata.target).rstrip('.')
-                        
-                    elif rdataset.rdtype == dns.rdatatype._by_text['A']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.A.A-class.html
-                        rr.type = 'A'
-                        rr.content = rdata.address
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['AAAA']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.AAAA.AAAA-class.html
-                        rr.type = 'AAAA'
-                        rr.content = rdata.address
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['SPF']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.SPF.SPF-class.html
-                        rr.type = 'SPF'
-                        rr.content = ' '.join(rdata.strings)
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['PTR']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.PTR.PTR-class.html
-                        rr.type = 'PTR'
-                        rr.content = str(rdata.target).rstrip('.')
-                    
-                    elif rdataset.rdtype == dns.rdatatype._by_text['SRV']:
-                        # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.SRV.SRV-class.html
-                        rr.type = 'SRV'
-                        rr.content = '%d %d %s' % (rdata.weight, rdata.port, str(rdata.target).rstrip('.'))
-                    
-                    rr.save()
-        
-        # Update zone serial
-        the_domain.update_serial()
-        
-        # Rectify zone
-        rectify_zone(the_domain.name)
-                    
-
     except NoSOA:
         raise Exception('The zone has no SOA RR at its origin')
     except NoNS:
@@ -201,6 +91,153 @@ def process_zone_file(origin, zonetext, overwrite=False):
     except DNSException, e:
         #raise Exception(str(e))
         raise Exception('The zone is malformed')
+
+
+def process_axfr_response(origin, nameserver, overwrite=False):
+    """
+    origin: string domain name
+    nameserver: IP of the DNS server
+    
+    """
+    origin = Name((origin.rstrip('.') + '.').split('.'))
+    axfr_query = dns.query.xfr(nameserver, origin, timeout=5, relativize=False, lifetime=10)
+    
+    try:
+        zone = dns.zone.from_xfr(axfr_query, relativize=False)
+        if not str(zone.origin).rstrip('.'):
+            raise UnknownOrigin
+        
+        process_and_import_zone_data(zone, overwrite)
+        
+    except NoSOA:
+        raise Exception('The zone has no SOA RR at its origin')
+    except NoNS:
+        raise Exception('The zone has no NS RRset at its origin')
+    except UnknownOrigin:
+        raise Exception('The zone\'s origin is unknown')
+    except BadZone:
+        raise Exception('The zone is malformed')
+    except DNSException, e:
+        #raise Exception(str(e))
+        raise Exception('The zone is malformed')
+    
+
+def process_and_import_zone_data(zone, overwrite=False):
+    """
+    zone: dns.zone
+    
+    *****
+    Special kudos to Grig Gheorghiu for demonstrating how to manage zone files
+    using dnspython in the following article:
+    http://agiletesting.blogspot.com/2005/08/managing-dns-zone-files-with-dnspython.html
+    *****
+    
+    """
+    Domain = cache.get_model('powerdns_manager', 'Domain')
+    Record = cache.get_model('powerdns_manager', 'Record')
+    
+    # Check if zone already exists in the database.
+    try:
+        domain_instance = Domain.objects.get(name=str(zone.origin).rstrip('.'))
+    except Domain.DoesNotExist:
+        pass    # proceed with importing the new zone data
+    else:   # Zone exists
+        if overwrite:
+            # If ``overwrite`` has been checked, then delete the current zone.
+            domain_instance.delete()
+        else:
+            raise Exception('Zone already exists. Consider using the "overwrite" option')
+    
+    # Import the new zone data to the database.
+    
+    # Create a domain instance
+    the_domain = Domain.objects.create(name=str(zone.origin).rstrip('.'), type='NATIVE', master='')
+    
+    # Create RRs
+    for name, node in zone.nodes.items():
+        rdatasets = node.rdatasets
+        
+        for rdataset in rdatasets:
+            
+            # Check instance variables of types:
+            # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes-module.html
+
+            for rdata in rdataset:
+                
+                rr = Record(
+                    domain=the_domain,
+                    name=str(name).rstrip('.'), # name is the dnspython node name
+                    change_date=int(time.time()),
+                    ttl = rdataset.ttl
+                )
+                
+                if rdataset.rdtype == dns.rdatatype._by_text['SOA']:
+                    # Set type
+                    rr.type = 'SOA'
+                    # Construct content
+                    rr.content = '%s %s %s %s %s %s %s' % (
+                        str(rdata.mname).rstrip('.'),
+                        str(rdata.rname).rstrip('.'),
+                        rdata.serial,
+                        rdata.refresh,
+                        rdata.retry,
+                        rdata.expire,
+                        rdata.minimum
+                    )
+
+                elif rdataset.rdtype == dns.rdatatype._by_text['NS']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.NS.NS-class.html
+                    rr.type = 'NS'
+                    rr.content = str(rdata.target).rstrip('.')
+
+                elif rdataset.rdtype == dns.rdatatype._by_text['MX']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.MX.MX-class.html
+                    rr.type = 'MX'
+                    rr.content = str(rdata.exchange).rstrip('.')
+                    rr.prio = rdata.preference
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['TXT']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.TXT.TXT-class.html
+                    rr.type = 'TXT'
+                    rr.content = ' '.join(rdata.strings)
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['CNAME']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.CNAME.CNAME-class.html
+                    rr.type = 'CNAME'
+                    rr.content = str(rdata.target).rstrip('.')
+                    
+                elif rdataset.rdtype == dns.rdatatype._by_text['A']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.A.A-class.html
+                    rr.type = 'A'
+                    rr.content = rdata.address
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['AAAA']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.AAAA.AAAA-class.html
+                    rr.type = 'AAAA'
+                    rr.content = rdata.address
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['SPF']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.SPF.SPF-class.html
+                    rr.type = 'SPF'
+                    rr.content = ' '.join(rdata.strings)
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['PTR']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.PTR.PTR-class.html
+                    rr.type = 'PTR'
+                    rr.content = str(rdata.target).rstrip('.')
+                
+                elif rdataset.rdtype == dns.rdatatype._by_text['SRV']:
+                    # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.SRV.SRV-class.html
+                    rr.type = 'SRV'
+                    rr.content = '%d %d %s' % (rdata.weight, rdata.port, str(rdata.target).rstrip('.'))
+                
+                rr.save()
+    
+    # Update zone serial
+    the_domain.update_serial()
+    
+    # Rectify zone
+    rectify_zone(the_domain.name)
 
 
 
