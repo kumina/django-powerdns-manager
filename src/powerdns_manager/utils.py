@@ -68,13 +68,12 @@ def process_zone_file(origin, zonetext, overwrite=False):
     *****
     
     """
-    # TODO: check what goes on with unicode
-    # Does not seem to be able to process unicode, so encode data to latin1
     if origin:
-        origin = origin.encode('latin1')
+        origin = Name((origin.rstrip('.') + '.').split('.'))
     else:
         origin = None
-    zonetext = zonetext.encode('latin1')
+    
+    zonetext = str(zonetext)
     zonetext = zonetext.replace('\r\n', '\n')
     
     Domain = cache.get_model('powerdns_manager', 'Domain')
@@ -219,10 +218,7 @@ def generate_zone_file(origin):
     
     # Generate the zone file
     
-    origin = origin.encode('latin1')    # TODO: check what goes on with unicode
-    
-    # Add trailing dot to origin
-    origin = origin.rstrip('.') + '.'
+    origin = Name((origin.rstrip('.') + '.').split('.'))
     
     # Create an empty dns.zone object.
     # We set check_origin=False because the zone contains no records.
