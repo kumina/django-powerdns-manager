@@ -191,3 +191,15 @@ def set_ttl_bulk(modeladmin, request, queryset):
 set_ttl_bulk.short_description = "Set Resource Records TTL"
 
 
+
+def force_serial_update(modeladmin, request, queryset):
+    """Action that updates the serial resets TTL information on all resource
+    records of the selected zones.
+    """
+    for domain in queryset:
+        domain.update_serial()
+    n = queryset.count()
+    messages.info(request, 'Successfully updated %d zones.' % n)
+force_serial_update.short_description = "Force serial update"
+
+
