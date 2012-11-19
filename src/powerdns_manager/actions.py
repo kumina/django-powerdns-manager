@@ -163,6 +163,10 @@ def set_ttl_bulk(modeladmin, request, queryset):
                         # If this is the SOA record and ``reset_zone_minimum`` has
                         # been checked, set the minimum TTL of the SOA record equal
                         # to the ``new_ttl`` value
+                        #
+                        # Important: We do not call ``models.Domain.set_minimum_ttl()``
+                        # because we edit the SOA record here.
+                        #
                         if reset_zone_minimum and rr.type == 'SOA':
                             bits = rr.content.split()
                             # SOA content:  primary hostmaster serial refresh retry expire default_ttl
