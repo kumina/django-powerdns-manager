@@ -231,7 +231,7 @@ class DomainAdmin(admin.ModelAdmin):
     
     fields = ('name', 'type', 'master', 'date_modified')
     readonly_fields = ('date_modified', )
-    list_display = ('name', 'type', 'master', 'date_modified')
+    list_display = ('name', 'export_zone_html_link', 'type', 'master', 'date_modified')
     list_filter = ('type', )
     search_fields = ('name', 'master')
     verbose_name = 'zone'

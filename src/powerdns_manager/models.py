@@ -28,6 +28,7 @@ from django.db import models
 from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.loading import cache
+from django.core.urlresolvers import reverse
 
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
@@ -141,6 +142,12 @@ class Domain(models.Model):
             soa_rr.content = ' '.join(bits)
             soa_rr.save()
     
+    def export_zone_html_link(self):
+        html_link = '<a href="%s"><strong>export zone</strong></a>' % reverse('export_zone', kwargs={'origin': self.name})
+        return html_link
+    export_zone_html_link.allow_tags = True
+    export_zone_html_link.short_description = 'Export'
+
 signal_cb.zone_saved.connect(signal_cb.rectify_zone_cb, sender=Domain)
 
 
