@@ -9,7 +9,9 @@
 {% block breadcrumbs %}
     <div class="breadcrumbs">
         <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-        &rsaquo; {% trans 'Import zone using AXFR query' %}
+        &rsaquo; <a href="{% url 'admin:app_list' app_label='powerdns_manager' %}">PowerDNS Manager</a>
+        &rsaquo; <a href="{% url 'admin:powerdns_manager_domain_changelist' %}">{% trans "Zones" %}</a>
+        &rsaquo; {% trans "Import zone using AXFR query" %}
     </div>
 {% endblock %}
 
