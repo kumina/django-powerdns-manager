@@ -321,7 +321,7 @@ def generate_zone_file(origin):
             rdtype = dns.rdatatype._by_text.get('TXT')
             rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
             rdata = dns.rdtypes.ANY.TXT.TXT(rdclass, rdtype,
-                strings = rr.content.split()
+                strings = rr.content.split(';')
             )
             rdataset.add(rdata, ttl=int(rr.ttl))
         
@@ -357,7 +357,7 @@ def generate_zone_file(origin):
             rdtype = dns.rdatatype._by_text.get('SPF')
             rdataset = zone.find_rdataset(record_name, rdtype=rdtype, create=True)
             rdata = dns.rdtypes.ANY.SPF.SPF(rdclass, rdtype,
-                strings = rr.content.split()
+                strings = rr.content.split(';')
             )
             rdataset.add(rdata, ttl=int(rr.ttl))
         
