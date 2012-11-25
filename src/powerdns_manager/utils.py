@@ -44,6 +44,7 @@ from dns.rdtypes.IN import *
 from dns.name import Name
 
 from django.db.models.loading import cache
+from django.utils.crypto import get_random_string
 
 
 
@@ -54,6 +55,11 @@ def generate_serial(old_serial=None, is_timestamp=True):
     
     """
     return int(time.time()) 
+
+
+def generate_api_key(self):
+    return get_random_string(
+        length=24, allowed_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 
 
 def process_zone_file(origin, zonetext, overwrite=False):
