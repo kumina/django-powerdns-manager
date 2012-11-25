@@ -86,6 +86,30 @@ your project::
     )
 
 
+Load default group
+==================
+
+This step is **optional**.
+
+*django-powerdns-manager* supports multiple users. Before non-superusers are
+able to add DNS data, a superuser must grant them permission to do so. In a
+typical Django project this is done by assigning the required permissions
+directly to the users or to a group, which the users are member of.
+
+*django-powerdns-manager* facilitates this process by providing a default group,
+named *PowerDNS Managers*, which has all the required permissions to add DNS
+information to the database with the exception of permissions to add/change/delete
+supermaster servers. Managing data of the *supermasters* table is left by
+default to Django superusers.
+
+To load this default group run the following command::
+
+    python manage.py loaddata default_pdns_groups
+
+Please not that the *default_pdns_groups* fixture is primary key agnostic so
+as to be imported without issues.
+
+
 Settings reference 
 ==================
 
