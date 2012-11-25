@@ -10,11 +10,18 @@ This section contains information, including examples, about how to use
 Using the Web Administration Interface
 ======================================
 
-- names without trailing dot
-- TTL and timeouts in seconds
+*django-powerdns-manager* uses the *admin* Django app to provide an
+administration interface. The layout is that of a typical Django project.
 
-TODO
+All resource records, domain metadata and crypto keys that belong to a specific
+zone are managed from a single web page.
 
+Here are some guidelines when entering DNS data::
+
+- All hostnames must be FQDN and should be entered without a trailing dot.
+- TTL and other time information should be entered in seconds.
+- Strings, for instance in TXT records, must not be enclosed in double quotes.
+ 
 
 Concept of Dynamic Zones
 ========================
@@ -62,9 +69,13 @@ TODO
 Import zone files
 =================
 
-Visit::
+To import by pasting zonefile data::
 
-    https://192.168.0.101/powerdns/import/
+    https://192.168.0.101/powerdns/import/zonefile/
+
+To import by using ACFR query::
+
+    https://192.168.0.101/powerdns/import/axfr/
 
 TODO
 
