@@ -57,7 +57,7 @@ def generate_serial(old_serial=None, is_timestamp=True):
     return int(time.time()) 
 
 
-def generate_api_key(self):
+def generate_api_key():
     return get_random_string(
         length=24, allowed_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 
