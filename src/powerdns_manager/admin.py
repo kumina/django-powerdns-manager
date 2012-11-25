@@ -58,6 +58,7 @@ from powerdns_manager.signal_cb import zone_saved
 from powerdns_manager.actions import set_domain_type_bulk
 from powerdns_manager.actions import set_ttl_bulk
 from powerdns_manager.actions import force_serial_update
+from powerdns_manager.utils import generate_api_key
 
 
 
@@ -370,7 +371,7 @@ class DynamicZoneAdmin(admin.ModelAdmin):
 
     def reset_api_key(self, request, queryset):
         for obj in queryset:
-            obj.api_key = self._get_new_api_key()
+            obj.api_key = generate_api_key()
             obj.save()
     reset_api_key.short_description = "Reset API Key"
     
@@ -391,13 +392,9 @@ class DynamicZoneAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.api_key = self._get_new_api_key()
+            obj.api_key = generate_api_key()
             obj.created_by = request.user
         obj.save()
-    
-    def _get_new_api_key(self):
-        return get_random_string(
-            length=24, allowed_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
-        
+
 admin.site.register(cache.get_model('powerdns_manager', 'DynamicZone'), DynamicZoneAdmin)
 
