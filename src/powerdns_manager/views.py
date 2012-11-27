@@ -169,22 +169,31 @@ def dynamic_ip_update_view(request):
     
     # Gather required information
     
+    # API key
+    
     api_key = form.cleaned_data['api_key']
+    
+    # Hostname
+    
     hostname = form.cleaned_data['hostname']
-    
-    ipv4 = form.cleaned_data['ipv4']
-    if not ipv4:
-        ipv4 = remote_ipv4
-    
-    ipv6 = form.cleaned_data['ipv6']
-    if not ipv6:
-        ipv6 = remote_ipv6
     
     # If the hostname is missing, the IP addresses of all A and AAAA records
     # of the zone are updated.
     update_all_hosts_in_zone = False
     if not hostname:
         update_all_hosts_in_zone = True
+    
+    # IP addresses
+    
+    ipv4 = form.cleaned_data['ipv4']
+    ipv6 = form.cleaned_data['ipv6']
+
+    # If IP information is missing, the remote client's IP address will be used.
+    if not ipv4 and not ipv6:
+        if remote_ipv4:
+            ipv4 = remote_ipv4
+        if remote_ipv6:
+            ipv6 = remote_ipv6
     
     # All required data is good. Process the request.
     
@@ -210,16 +219,21 @@ def dynamic_ip_update_view(request):
             return HttpResponseNotFound('error:Hostname not found: %s' % hostname)
     
     # Update the IPs
+    
+    rr_has_changed = False
+    
     if update_all_hosts_in_zone:    # No hostname supplied
         for rr in dyn_rrs:
             
             # Try to update A records
             if rr.type == 'A' and ipv4:
                 rr.content = ipv4
+                rr_has_changed = True
             
             # Try to update AAAA records
             elif rr.type == 'AAAA' and ipv6:
                 rr.content = ipv6
+                rr_has_changed = True
             
             rr.save()
         
@@ -230,12 +244,17 @@ def dynamic_ip_update_view(request):
                 # Try to update A records
                 if rr.type == 'A' and ipv4:
                     rr.content = ipv4
+                    rr_has_changed = True
             
                 # Try to update AAAA records
                 elif rr.type == 'AAAA' and ipv6:
                     rr.content = ipv6
+                    rr_has_changed = True
                 
                 rr.save()
     
-    return HttpResponse('Success')
+    if rr_has_changed:
+        return HttpResponse('Success')
+    else:
+        return HttpResponseNotFound('error:No suitable record found')
 
