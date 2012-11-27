@@ -196,6 +196,16 @@ def dynamic_ip_update_view(request):
     if not dyn_rrs:
         HttpResponseNotFound('A or AAAA resource records not found')
     
+    # Check existence of hostname
+    if hostname:
+        hostname_exists = False
+        for rr in dyn_rrs:
+            if rr.name == hostname:
+                hostname_exists = True
+                break
+        if not hostname_exists:
+            return HttpResponseNotFound('Hostname not found: %s' % hostname)
+    
     # Update the IPs
     if update_all_hosts_in_zone:    # No hostname supplied
         for rr in dyn_rrs:
