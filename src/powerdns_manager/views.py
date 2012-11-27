@@ -204,7 +204,7 @@ def dynamic_ip_update_view(request):
                 hostname_exists = True
                 break
         if not hostname_exists:
-            return HttpResponseNotFound('Hostname not found: %s' % hostname)
+            return HttpResponseNotFound('error:Hostname not found: %s' % hostname)
     
     # Update the IPs
     if update_all_hosts_in_zone:    # No hostname supplied
