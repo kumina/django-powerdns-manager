@@ -211,11 +211,11 @@ def dynamic_ip_update_view(request):
         for rr in dyn_rrs:
             
             # Try to update A records
-            if ipv4 and rr.type == 'A':
+            if rr.type == 'A' and ipv4:
                 rr.content = ipv4
             
             # Try to update AAAA records
-            elif ipv6 and rr.type == 'AAAA':
+            elif rr.type == 'AAAA' and ipv6:
                 rr.content = ipv6
             
             rr.save()
@@ -225,11 +225,11 @@ def dynamic_ip_update_view(request):
             if rr.name == hostname:
                 
                 # Try to update A records
-                if ipv4 and rr.type == 'A':
+                if rr.type == 'A' and ipv4:
                     rr.content = ipv4
             
                 # Try to update AAAA records
-                elif ipv6 and rr.type == 'AAAA':
+                elif rr.type == 'AAAA' and ipv6:
                     rr.content = ipv6
                 
                 rr.save()
