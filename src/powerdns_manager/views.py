@@ -256,5 +256,5 @@ def dynamic_ip_update_view(request):
     if rr_has_changed:
         return HttpResponse('Success')
     else:
-        return HttpResponseNotFound('error:No suitable record found')
+        return HttpResponseNotFound('error:No suitable resource record found')
 
