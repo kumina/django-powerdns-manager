@@ -33,6 +33,7 @@ from django.core.urlresolvers import reverse
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
 from powerdns_manager.utils import generate_serial
+from powerdns_manager.utils import generate_api_key
 
 
 
@@ -378,18 +379,34 @@ class DynamicZone(models.Model):
     
     """
     domain = models.ForeignKey('powerdns_manager.Domain', unique=True, related_name='%(app_label)s_%(class)s_domain', verbose_name=_('domain'), help_text=_("""Select the domain, the A and AAAA records of which might be updated dynamically over HTTP."""))
-    api_key = models.CharField(max_length=24, verbose_name=_('API Key'), help_text="""The API key is generated automatically. To reset it, use the relevant action in the changelist view.""")
-
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created on'))
+    is_dynamic = models.BooleanField(verbose_name=_('Dynamic zone'), help_text="""Check to mark this zone as dynamic. An API key will be generated for you so as to be able to update the A nd AAAA records IP addresses over HTTP.""")
+    api_key = models.CharField(max_length=24, null=True, verbose_name=_('API Key'), help_text="""The API key is generated automatically. To reset it, use the relevant action in the changelist view.""")
     date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
-    created_by = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_('created by'), help_text="""The Django user this zone belongs to.""")
     
     class Meta:
+        db_table = 'dynamiczones'
         verbose_name = _('dynamic zone')
         verbose_name_plural = _('dynamic zones')
         get_latest_by = 'date_modified'
-        ordering = ['-date_created']
+        ordering = ['-domain']
         
     def __unicode__(self):
         return self.domain.name
+    
+    def save(self, *args, **kwargs):
+        """Saves the instance to the database.
+        
+        If ``is_dynamic`` has been enabled and if ``api_key`` is empty,
+        then generate a new API key. If ``api_key`` is not empty, do nothing.
+        
+        If ``is_dynamic`` is not enabled, always set ``api_key`` to NULL.
+        
+        """
+        if self.is_dynamic:
+            if not self.api_key:
+                self.api_key = generate_api_key()
+        else:
+            self.api_key = None
+        
+        return super(DynamicZone, self).save(*args, **kwargs)
 

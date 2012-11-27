@@ -58,7 +58,21 @@ from powerdns_manager.signal_cb import zone_saved
 from powerdns_manager.actions import set_domain_type_bulk
 from powerdns_manager.actions import set_ttl_bulk
 from powerdns_manager.actions import force_serial_update
+from powerdns_manager.actions import reset_api_key
 from powerdns_manager.utils import generate_api_key
+
+
+
+class DynamicZoneInline(admin.StackedInline):
+    model = cache.get_model('powerdns_manager', 'DynamicZone')
+    fields = ('is_dynamic', 'api_key', 'date_modified')
+    readonly_fields = ('api_key', 'date_modified')
+    search_fields = ('domain', )
+    verbose_name = 'Dynamic Zone'
+    verbose_name_plural = 'Dynamic Zone'    # Only one dynamic zone per domain
+    # Show exactly one form
+    extra = 1
+    max_num = 1
 
 
 
@@ -238,13 +252,13 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
-    actions = [set_domain_type_bulk, set_ttl_bulk, force_serial_update]
+    actions = [reset_api_key, set_domain_type_bulk, set_ttl_bulk, force_serial_update]
     change_list_template = 'powerdns_manager/domain_changelist.html'
     
     #
     # Build the ``inlines`` list. Only inlines for enabled RR types are included.
     # 
-    inlines = []
+    inlines = [DynamicZoneInline]
     
     # Resource Record type to Resource Record Inline Map
     RR_INLINE_MAP = {
@@ -358,43 +372,4 @@ class SuperMasterAdmin(admin.ModelAdmin):
     
 admin.site.register(cache.get_model('powerdns_manager', 'SuperMaster'), SuperMasterAdmin)
 
-
-
-class DynamicZoneAdmin(admin.ModelAdmin):
-    fields = ('domain', 'api_key', 'date_created', 'date_modified')
-    readonly_fields = ('api_key', 'date_created', 'date_modified')
-    list_display = ('domain', 'date_created', 'date_modified')
-    search_fields = ('domain', )
-    verbose_name = 'Dynamic Zone'
-    verbose_name_plural = 'Dynamic Zones'
-    actions = ['reset_api_key']
-
-    def reset_api_key(self, request, queryset):
-        for obj in queryset:
-            obj.api_key = generate_api_key()
-            obj.save()
-    reset_api_key.short_description = "Reset API Key"
-    
-    def queryset(self, request):
-        qs = super(DynamicZoneAdmin, self).queryset(request)
-        if not request.user.is_superuser:
-            # Non-superusers see the dynamic zones they have created
-            qs = qs.filter(created_by=request.user)
-        return qs
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        Domain = cache.get_model('powerdns_manager', 'Domain')
-        if db_field.name == 'domain':
-            if not request.user.is_superuser:    # Superusers see the full choice list
-                kwargs["queryset"] = Domain.objects.filter(
-                    created_by=request.user, powerdns_manager_dynamiczone_domain__isnull=True)
-        return super(DynamicZoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-    
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.api_key = generate_api_key()
-            obj.created_by = request.user
-        obj.save()
-
-admin.site.register(cache.get_model('powerdns_manager', 'DynamicZone'), DynamicZoneAdmin)
 
