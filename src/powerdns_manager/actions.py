@@ -41,6 +41,7 @@ from django.db.models.loading import cache
 
 from powerdns_manager.forms import ZoneTypeSelectionForm
 from powerdns_manager.forms import TtlSelectionForm
+from powerdns_manager.utils import generate_api_key
 
 
 
@@ -52,6 +53,23 @@ from powerdns_manager.forms import TtlSelectionForm
 #def test_action(modeladmin, request, queryset):
 #    messages.add_message(request, messages.INFO, 'The test action was successful.')
 #test_action.short_description = "Test Action"
+
+
+def reset_api_key(modeladmin, request, queryset):
+    DynamicZone = cache.get_model('powerdns_manager', 'DynamicZone')
+    n = queryset.count()
+    for domain_obj in queryset:
+        # Only one DynamicZone instance for each Domain
+        dz = DynamicZone.objects.get(domain=domain_obj)
+        if dz.api_key:
+            dz.api_key = generate_api_key()
+            dz.save()
+        else:
+            messages.error(request, 'Zone is not dynamic: %s' % domain_obj.name)
+            n = n - 1
+    if n:
+        messages.info(request, 'Successfully updated %d domains.' % n)
+reset_api_key.short_description = "Reset API Key"
 
 
 def set_domain_type_bulk(modeladmin, request, queryset):
