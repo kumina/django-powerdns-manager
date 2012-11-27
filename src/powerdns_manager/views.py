@@ -134,6 +134,9 @@ def dynamic_ip_update_view(request):
     otherwise only the specific record with the name=hostname and provided that the
     correct ip (v4, v6) has been provided for the type of the record (A, AAAA)
     
+    If no ipv4 or ipv6 address is provided, then the client IP address is used
+    to update A records (if the client IP is IPv4) or AAAA records (if client IP is IPv6).
+    
     curl -k \
         -F "api_key=UBSE1RJ0J175MRAMJC31JFUH" \
         -F "hostname=ns1.centos.example.org" \
