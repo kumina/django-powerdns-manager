@@ -194,7 +194,7 @@ def dynamic_ip_update_view(request):
     # Get A and AAAA records
     dyn_rrs = Record.objects.filter(domain=dyn_zone.domain, type__in=('A', 'AAAA'))
     if not dyn_rrs:
-        HttpResponseNotFound('A or AAAA resource records not found')
+        return HttpResponseNotFound('A or AAAA resource records not found')
     
     # Check existence of hostname
     if hostname:
