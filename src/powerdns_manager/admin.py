@@ -65,8 +65,8 @@ from powerdns_manager.utils import generate_api_key
 
 class DynamicZoneInline(admin.StackedInline):
     model = cache.get_model('powerdns_manager', 'DynamicZone')
-    fields = ('is_dynamic', 'api_key', 'date_modified')
-    readonly_fields = ('api_key', 'date_modified')
+    fields = ('is_dynamic', 'api_key')
+    readonly_fields = ('api_key', )
     search_fields = ('domain', )
     verbose_name = 'Dynamic Zone'
     verbose_name_plural = 'Dynamic Zone'    # Only one dynamic zone per domain
@@ -81,8 +81,7 @@ class BaseTabularRecordInline(admin.TabularInline):
     form = '__OVERRIDE__'
     model = cache.get_model('powerdns_manager', 'Record')
     extra = 0
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
+    fields = ('name', 'ttl', 'content')
     
     def __init__(self, *args, **kwargs):
         self.verbose_name = '%s Resource Record' % self.RR_TYPE
@@ -106,8 +105,7 @@ class SoaRecordInline(admin.StackedInline):
     verbose_name_plural = 'SOA Resource Record' # Only one SOA RR per zone
     # The ``name`` field is not available for editing. It is always set to the
     # name of the domain in ``forms.SoaRecordModelForm.save()`` method.
-    fields = ('ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl', 'date_modified')
-    readonly_fields = ('date_modified', )
+    fields = ('ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl')
     can_delete = False
     
     def queryset(self, request):
@@ -123,12 +121,12 @@ class NsRecordInline(BaseTabularRecordInline):
 class MxRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'MX'
     form = MxRecordModelForm
-    fields = ('name', 'ttl', 'prio', 'content', 'date_modified')
+    fields = ('name', 'ttl', 'prio', 'content')
     
 class SrvRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'SRV'
     form = SrvRecordModelForm
-    fields = ('name', 'ttl', 'prio', 'weight', 'port', 'target', 'date_modified')
+    fields = ('name', 'ttl', 'prio', 'weight', 'port', 'target')
 
 class ARecordInline(BaseTabularRecordInline):
     RR_TYPE = 'A'
@@ -212,8 +210,8 @@ class EmptyNonTerminalRecordInline(admin.TabularInline):
     extra = 0
     verbose_name = 'Empty Non-Terminal Resource Record'
     verbose_name_plural = 'Empty Non-Terminal Resource Record' # Only one SOA RR per zone
-    fields = ('name', 'ttl', 'content', 'date_modified')
-    readonly_fields = ('name', 'ttl', 'content', 'date_modified')
+    fields = ('name', 'ttl', 'content')
+    readonly_fields = ('name', 'ttl', 'content')
     can_delete = False
     
     def queryset(self, request):
@@ -224,16 +222,14 @@ class EmptyNonTerminalRecordInline(admin.TabularInline):
 
 class DomainMetadataInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'DomainMetadata')
-    fields = ('kind', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
+    fields = ('kind', 'content', )
     extra = 0
     verbose_name_plural = 'Domain Metadata'
 
     
 class CryptoKeyInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'CryptoKey')
-    fields = ('flags', 'active', 'content', 'date_modified')
-    readonly_fields = ('date_modified', )
+    fields = ('flags', 'active', 'content')
     extra = 0
     verbose_name_plural = 'Crypto Keys'
 
@@ -244,7 +240,7 @@ class DomainAdmin(admin.ModelAdmin):
     #form = DomainModelForm
     #actions = [test_action, ]
     
-    fields = ('name', 'type', 'master', 'date_modified')
+    fields = ('date_modified', 'name', 'type', 'master')
     readonly_fields = ('date_modified', )
     list_display = ('name', 'export_zone_html_link', 'type', 'master', 'date_modified')
     list_filter = ('type', )
