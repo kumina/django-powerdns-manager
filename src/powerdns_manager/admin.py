@@ -70,6 +70,7 @@ class DynamicZoneInline(admin.StackedInline):
     search_fields = ('domain', )
     verbose_name = 'Dynamic Zone'
     verbose_name_plural = 'Dynamic Zone'    # Only one dynamic zone per domain
+    can_delete = False
     # Show exactly one form
     extra = 1
     max_num = 1
