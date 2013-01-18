@@ -1,6 +1,6 @@
 [
   {
-    "pk": 2, 
+    "pk": null, 
     "model": "auth.group", 
     "fields": {
       "name": "PowerDNS Managers", 
