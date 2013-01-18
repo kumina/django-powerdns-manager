@@ -328,7 +328,7 @@ class DomainAdmin(admin.ModelAdmin):
         """
         super(DomainAdmin, self).save_related(request, form, formsets, change)
         # Send the zone_saved signal
-        zone_saved.send(sender=self.model, origin=form.cleaned_data.get('name'))
+        zone_saved.send(sender=self.model, instance=form.instance)
 
 admin.site.register(cache.get_model('powerdns_manager', 'Domain'), DomainAdmin)
 

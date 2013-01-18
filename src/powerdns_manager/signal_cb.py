@@ -33,9 +33,10 @@ from powerdns_manager.utils import rectify_zone
 # ``zone_saved`` signal.
 # Sent by admin.DomainAdmin.save_related() after the Domain instance and all
 # the associated Record instances have been saved.
-zone_saved = django.dispatch.Signal(providing_args=['origin'])
+zone_saved = django.dispatch.Signal(providing_args=['instance'])
 
 
 def rectify_zone_cb(sender, **kwargs):
-    rectify_zone(kwargs['origin'])
+    instance = kwargs['instance']   # powerdns_manager.Domain instance
+    rectify_zone(instance.name)
 
