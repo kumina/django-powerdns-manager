@@ -151,7 +151,7 @@ class Domain(models.Model):
     export_zone_html_link.short_description = 'Export'
 
 signal_cb.zone_saved.connect(signal_cb.rectify_zone_cb, sender=Domain)
-
+signal_cb.zone_saved.connect(signal_cb.update_zone_serial_cb, sender=Domain)
 
 
 class Record(models.Model):

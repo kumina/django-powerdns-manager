@@ -40,3 +40,7 @@ def rectify_zone_cb(sender, **kwargs):
     instance = kwargs['instance']   # powerdns_manager.Domain instance
     rectify_zone(instance.name)
 
+def update_zone_serial_cb(sender, **kwargs):
+    instance = kwargs['instance']   # powerdns_manager.Domain instance
+    instance.update_serial()
+
