@@ -24,6 +24,7 @@
 #  limitations under the License.
 #
 
+import datetime
 import time
 import hashlib
 import base64
@@ -47,14 +48,42 @@ from django.db.models.loading import cache
 from django.utils.crypto import get_random_string
 
 
-
-def generate_serial(old_serial=None, is_timestamp=True):
-    """Generates a new serial for the zone.
+def generate_serial(serial_old=None):
+    """Return a serial number for the zone in the form YYYYMMDDNN.
     
     Currently returns the Unix timestamp.
     
     """
-    return int(time.time()) 
+    curdate = datetime.date.today()
+    
+    if serial_old is not None:
+        # Split provided serial into YYYY, MM, DD, and NN.
+        yyyy = serial_old[0:4]
+        mm = serial_old[4:6]
+        dd = serial_old[6:8]
+        nn = serial_old[8:10]
+        
+        # Try to get a datetime object of the old serial's date.
+        try:
+            serial_date = datetime.date(year=int(yyyy), month=int(mm), day=int(dd))
+        except ValueError:
+            # The serial is corrupted. Pass. A new serial will be generated.
+            pass
+        else:
+            # If the old serial number's date is equal to the current date, then
+            # increment nn by one and return the new serial.
+            if serial_date == curdate:
+                nn_new = str(int(nn) + 1).zfill(2)[:2]  # Is always 2 digits long
+                return '%s%s%s%s' % (yyyy, mm, dd, nn_new)
+    
+    # A new serial needs to be generated for the current date.
+    return '%s%s%s%s' % (
+        curdate.year, str(curdate.month).zfill(2), str(curdate.day).zfill(2), '01')
+
+
+def generate_serial_timestamp(old_serial=None, is_timestamp=True):
+    """Return the current Unix timestamp."""
+    return int(time.time())
 
 
 def generate_api_key():

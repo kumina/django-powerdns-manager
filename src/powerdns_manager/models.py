@@ -33,6 +33,7 @@ from django.core.urlresolvers import reverse
 from powerdns_manager import settings
 from powerdns_manager import signal_cb
 from powerdns_manager.utils import generate_serial
+from powerdns_manager.utils import generate_serial_timestamp
 from powerdns_manager.utils import generate_api_key
 
 
@@ -139,7 +140,7 @@ class Domain(models.Model):
             raise Exception('SOA Resource Record does not exist.')
         else:
             bits = soa_rr.content.split()
-            bits[2] = str(generate_serial())
+            bits[2] = str(generate_serial(serial_old=bits[2]))
             soa_rr.content = ' '.join(bits)
             soa_rr.save()
     
@@ -219,7 +220,7 @@ class Record(models.Model):
         4) Set the ``ordername`` field. Needed by PowerDNS internals.
         
         """
-        self.change_date = generate_serial()
+        self.change_date = generate_serial_timestamp()
         
         if not self.ttl:
             self.ttl = self.domain.get_minimum_ttl()
