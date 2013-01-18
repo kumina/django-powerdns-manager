@@ -73,7 +73,12 @@ def generate_serial(serial_old=None):
             # If the old serial number's date is equal to the current date, then
             # increment nn by one and return the new serial.
             if serial_date == curdate:
-                nn_new = str(int(nn) + 1).zfill(2)[:2]  # Is always 2 digits long
+                if int(nn) == 99:
+                    # If you make more than 99 zone updates within a single day,
+                    # DNS is not for you!! NN stays at 99.
+                    nn_new = 99
+                else:
+                    nn_new = str(int(nn) + 1).zfill(2)[:2]  # Is always 2 digits long
                 return '%s%s%s%s' % (yyyy, mm, dd, nn_new)
     
     # A new serial needs to be generated for the current date.
