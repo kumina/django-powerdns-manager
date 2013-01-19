@@ -70,7 +70,7 @@ if __name__=='__main__':
         url = 'http://www.codetrax.org/projects/django-powerdns-manager',
         description = 'django-powerdns-manager is a web based PowerDNS administration panel.',
         long_description = read('README'),
-        download_url = 'https://source.codetrax.org/hgroot/django-powerdns-manager',
+        download_url = 'https://bitbucket.org/gnotaras/django-powerdns-manager',
         platforms=['any'],
         classifiers = [
             get_status_classifier(),
