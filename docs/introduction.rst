@@ -25,9 +25,9 @@ Features
 - The application can be configured to support a user-defined subset of the
   resource records supported by PowerDNS and customize the order in which they
   appear in the administration panel.
-- Zone file import through web form (experimental).
-- Zone file export (experimental).
-- Command-line interfaces to import and export zones in bulk (experimental).
+- Zone file import through web form.
+- Zone file export.
+- Command-line interfaces to import and export zones in bulk.
 - Support for secure updating of dynamic IP addresses in A and AAAA records
   over HTTP.
 - Supports using a dedicated database to store the tables needed by PowerDNS.
