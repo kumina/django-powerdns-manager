@@ -112,7 +112,7 @@ class SoaRecordModelForm(BaseRecordModelForm):
     def __init__(self, *args, **kwargs):
         """ModelForm constructor.
         
-        If the user edits an existing SOA RR throught the InlineModelAdmin,
+        If the user edits an existing SOA RR through the InlineModelAdmin,
         the following code reads the existing content of the ``Record.content``
         field, splits the information into pieces, and fills the initial data
         of the extra fields we have added to the form.
