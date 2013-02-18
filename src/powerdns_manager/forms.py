@@ -136,11 +136,18 @@ class SoaRecordModelForm(BaseRecordModelForm):
                         'default_ttl': bits[6],
                     }
         super(SoaRecordModelForm, self).__init__(*args, **kwargs)
-        
+    
+    def clean_primary(self):
+        primary = self.cleaned_data.get('primary')
+        validate_hostname(primary)
+        return primary
+    
     def clean_hostmaster(self):
         hostmaster = self.cleaned_data.get('hostmaster')
         if hostmaster.find('@') != -1:
             raise forms.ValidationError("""This should be specified in the mailbox-as-domain-name format where the `@' character is replaced with a dot. Example: hostmaster.domain.tld represents hostmaster@domain.tld""")
+        # treat the hostmaster as a hostname and use the hostname validator.
+        validate_hostname(hostmaster)
         return hostmaster
     
     def save(self, *args, **kwargs):
