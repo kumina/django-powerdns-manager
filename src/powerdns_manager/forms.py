@@ -357,6 +357,16 @@ class CnameRecordModelForm(BaseRecordModelForm):
 class PtrRecordModelForm(BaseRecordModelForm):
     """ModelForm for PTR resource records."""
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, reject_ip=False, supports_cidr_notation=True)
+        return name
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        validate_hostname(content)
+        return content
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'PTR'
         return super(PtrRecordModelForm, self).save(*args, **kwargs)
