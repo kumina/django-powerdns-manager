@@ -375,6 +375,11 @@ class PtrRecordModelForm(BaseRecordModelForm):
 class TxtRecordModelForm(BaseRecordModelForm):
     """ModelForm for TXT resource records."""
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, supports_wildcard=True)
+        return name
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'TXT'
         return super(TxtRecordModelForm, self).save(*args, **kwargs)
