@@ -420,6 +420,11 @@ class LocRecordModelForm(BaseRecordModelForm):
 class SpfRecordModelForm(BaseRecordModelForm):
     """ModelForm for SPF resource records."""
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, supports_wildcard=True)
+        return name
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'SPF'
         return super(SpfRecordModelForm, self).save(*args, **kwargs)
