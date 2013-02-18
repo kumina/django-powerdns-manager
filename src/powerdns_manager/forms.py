@@ -230,6 +230,16 @@ class NsRecordModelForm(BaseRecordModelForm):
 class MxRecordModelForm(BaseRecordModelForm):
     """ModelForm for MX resource records."""
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, supports_wildcard=True)
+        return name
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        validate_hostname(content)
+        return content
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'MX'
         return super(MxRecordModelForm, self).save(*args, **kwargs)
