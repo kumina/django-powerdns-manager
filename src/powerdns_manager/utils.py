@@ -60,6 +60,9 @@ def validate_hostname(hostname,
     
     In case ``hostname`` is not validated a ``ValidationError`` is raised.
     
+    PowerDNS expects to find FQDN hostnames, so if the hostname ends with a dot,
+    it is rejected.
+    
     By default, the valid hostname characters are:
     
         A-Za-z0-9._-
@@ -76,6 +79,9 @@ def validate_hostname(hostname,
     """
     if not hostname:
         return
+    
+    if hostname.endswith('.'):
+        raise ValidationError('PowerDNS expects to find FQDN hostnames without trailing dot')
     
     if reject_ip:
         # Check if hostname is an IP and reject it if it is.
