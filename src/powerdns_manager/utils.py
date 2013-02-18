@@ -30,6 +30,7 @@ import hashlib
 import base64
 import string
 import StringIO
+import re
 
 import dns.zone
 import dns.query
@@ -46,6 +47,56 @@ from dns.name import Name
 
 from django.db.models.loading import cache
 from django.utils.crypto import get_random_string
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv46_address
+
+from powerdns_manager import settings
+
+
+
+def validate_hostname(hostname,
+        reject_ip=True, supports_cidr_notation=False, supports_wildcard=False):
+    """Validates that ``hostname`` does not contain illegal characters.
+    
+    In case ``hostname`` is not validated a ``ValidationError`` is raised.
+    
+    By default, the valid hostname characters are:
+    
+        A-Za-z0-9._-
+    
+    The pattern above allows the hostname to be an IP address (IPv4). By default,
+    if hostname validates as an IP address, it is rejected. To allow IP addresses
+    as hostnames, set ``reject_ip`` to False when calling this validator.
+    
+    If ``supports_cidr_notation`` is True, then ``/`` is allowed too.
+    
+    If ``supports_wildcard`` is True, then ``*`` is allowed too, unless
+    the ``PDNS_ALLOW_WILDCARD_NAMES`` has been set to False (default is True).
+    
+    """
+    if not hostname:
+        return
+    
+    if reject_ip:
+        # Check if hostname is an IP and reject it if it is.
+        try:
+            validate_ipv46_address(hostname)
+        except ValidationError:
+            pass
+        else:
+            raise ValidationError('IP addresses cannot be used as hostnames')
+    
+    valid_sequence = 'A-Za-z0-9._\-'    # dash needs to be escaped
+    
+    if supports_cidr_notation:
+        valid_sequence = '%s/' % valid_sequence
+        
+    if supports_wildcard:
+        if settings.PDNS_ALLOW_WILDCARD_NAMES:
+            valid_sequence = '%s*' % valid_sequence
+    
+    if not re.match('^[%s]+$' % valid_sequence, hostname):
+        raise ValidationError('The hostname contains illegal characters')
 
 
 def generate_serial(serial_old=None):

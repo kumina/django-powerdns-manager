@@ -166,6 +166,11 @@ module to customize the functionality of *django-powerdns-manager*.
 ``PDNS_IS_SLAVE``
     Can be ``True`` or ``False``. Currently has not effect.
 
+``PDNS_ALLOW_WILDCARD_NAMES``
+    Can be ``True`` or ``False``. Turns wildcard support on and off respectively.
+    This setting affects input validation in the ``name`` and ``content`` fields
+    of those resource records that support wildcards.
+
 .. _supports: http://doc.powerdns.com/types.html
 
 
