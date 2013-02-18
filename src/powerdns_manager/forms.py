@@ -316,6 +316,11 @@ class ARecordModelForm(BaseRecordModelForm):
 class AaaaRecordModelForm(BaseRecordModelForm):
     """ModelForm for AAAA resource records."""
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, supports_wildcard=True)
+        return name
+    
     def clean_content(self):
         """Ensures that content is an IPv6 address."""
         content = self.cleaned_data.get('content')
