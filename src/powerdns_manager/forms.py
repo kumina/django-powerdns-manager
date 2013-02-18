@@ -270,6 +270,16 @@ class SrvRecordModelForm(BaseRecordModelForm):
                     }
         super(SrvRecordModelForm, self).__init__(*args, **kwargs)
     
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name)
+        return name
+    
+    def clean_target(self):
+        target = self.cleaned_data.get('target')
+        validate_hostname(target)
+        return target
+    
     def save(self, *args, **kwargs):
         self.instance.type = 'SRV'
         self.instance.content = '%d %d %s' % (
