@@ -35,6 +35,7 @@ from django.core.validators import validate_ipv6_address
 from django.core.exceptions import ValidationError
 
 from powerdns_manager import settings
+from powerdns_manager.utils import validate_hostname
 
 
 
@@ -203,6 +204,16 @@ class SoaRecordModelForm(BaseRecordModelForm):
 
 class NsRecordModelForm(BaseRecordModelForm):
     """ModelForm for NS resource records."""
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name)
+        return name
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        validate_hostname(content)
+        return content
 
     def save(self, *args, **kwargs):
         self.instance.type = 'NS'
