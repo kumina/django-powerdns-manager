@@ -240,6 +240,12 @@ def clone_zone(modeladmin, request, queryset):
     
     Accepts only one selected zone.
     
+    Clones:
+    
+      - Resource Records
+      - Dynamic setting
+      - Domain Metadata
+    
     This action first displays a page which provides an input box to enter
     the origin of the new zone.
     
@@ -260,6 +266,7 @@ def clone_zone(modeladmin, request, queryset):
     
     Domain = cache.get_model('powerdns_manager', 'Domain')
     Record = cache.get_model('powerdns_manager', 'Record')
+    DynamicZone = cache.get_model('powerdns_manager', 'DynamicZone')
 
     # Check the number of selected zones. This action can work on a single zone.
     
@@ -300,8 +307,7 @@ def clone_zone(modeladmin, request, queryset):
             # At this point queryset contain exactly one object. Checked above.
             domain_obj = queryset[0]
             
-            # Find all resource records of this domain
-            domain_rr_qs = Record.objects.filter(domain=domain_obj)
+            # Clone base zone
             
             # Create the clone (Check for uniqueness takes place in forms.ClonedZoneDomainForm 
             clone_obj = Domain.objects.create(
@@ -314,6 +320,11 @@ def clone_zone(modeladmin, request, queryset):
                 created_by = request.user   # We deliberately do not use the domain_obj.created_by
             )
             modeladmin.log_addition(request, clone_obj)
+            
+            # Clone Resource Records
+            
+            # Find all resource records of this domain
+            domain_rr_qs = Record.objects.filter(domain=domain_obj)
             
             # Create the clone's RRs
             for rr in domain_rr_qs:
@@ -351,7 +362,20 @@ def clone_zone(modeladmin, request, queryset):
                     ordername = rr.ordername
                 )
                 clone_rr.save()
-                modeladmin.log_addition(request, clone_rr)
+                #modeladmin.log_addition(request, clone_rr)
+            
+            # Clone Dynamic Zone setting
+            
+            # Get the base domain's dynamic zone.
+            # There is only one Dynamic Zone object for each zone.
+            domain_dynzone_obj = DynamicZone.objects.get(domain=domain_obj)
+            
+            # Create and save the dynamic zone object for the clone.
+            clone_dynzone_obj = DynamicZone(
+                domain = clone_obj,
+                is_dynamic = domain_dynzone_obj.is_dynamic
+                )
+            clone_dynzone_obj.save()
             
             messages.info(request, 'Successfully cloned %s zone to %s' % \
                 (domain_obj.name, clone_domain_name))
