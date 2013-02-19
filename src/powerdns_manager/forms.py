@@ -95,9 +95,10 @@ class BaseRecordModelForm(forms.ModelForm):
         
         name = self.cleaned_data.get('name')
         domain = self.cleaned_data.get('domain')
-        if name and domain:
-            if len(name.split('.')) < len(domain.name.split('.')):
-                msg = 'Invalid record name. This name belongs to a parent zone.'
+        if name and domain.name:
+            #if len(name.split('.')) < len(domain.name.split('.')):
+            if not name.endswith(domain.name):
+                msg = 'Invalid record name. This name belongs to a different zone.'
                 self._errors["name"] = self.error_class([msg])
         
         return self.cleaned_data
