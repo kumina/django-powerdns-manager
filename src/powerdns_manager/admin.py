@@ -303,9 +303,8 @@ class DomainAdmin(admin.ModelAdmin):
         if not change:
             obj.created_by = request.user
         obj.save()
-        # TODO: Find a way to update the zone serial (SOA record)
-        # At this point, the records have not been saved yet.
-        # Perhaps with a signal in save_related()
+        # The zone serial is updated after all RRs have been saved.
+        # This is accomplished by sending the ``zone_saved`` signal in ``save_related()``
     
     def save_related(self, request, form, formsets, change):
         """Calls the signal that rectifies the zone.
