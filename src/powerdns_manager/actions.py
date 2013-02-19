@@ -38,6 +38,7 @@ from django.contrib import messages
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.db.models.loading import cache
+from django.core.urlresolvers import reverse
 
 from powerdns_manager.forms import ZoneTypeSelectionForm
 from powerdns_manager.forms import TtlSelectionForm
@@ -355,9 +356,10 @@ def clone_zone(modeladmin, request, queryset):
             
             messages.info(request, 'Successfully cloned %s zone to %s' % \
                 (domain_obj.name, clone_domain_name))
-            # Return None to display the change list page again.
-            return None
-        
+            
+            # Redirect to the new zone's change form.
+            return HttpResponseRedirect(reverse('admin:%s_domain_change' % app_label, args=(clone_obj.id,)))
+    
     else:
         form = ClonedZoneDomainForm()
     
