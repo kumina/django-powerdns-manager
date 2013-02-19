@@ -276,6 +276,10 @@ class MxRecordModelForm(BaseRecordModelForm):
 class SrvRecordModelForm(BaseRecordModelForm):
     """ModelForm for SRV resource records.
     
+    Content for SRV record:
+    
+        weight port target
+    
     For details see docstrings in SoaRecordModelForm.
     
     """
@@ -603,4 +607,26 @@ class TtlSelectionForm(forms.Form):
     new_ttl = forms.IntegerField(min_value=settings.PDNS_DEFAULT_RR_TTL, required=True, label=_('New TTL'), help_text="""Enter the new Time-To-Live (TTL) in seconds.""")
     reset_zone_minimum = forms.BooleanField(required=False, label=_('Reset minimum TTL of the zones?'), help_text="""If checked, the minimum TTL of the selected zones will be reset to the new TTL value.""")
 
+
+
+class ClonedZoneDomainForm(forms.Form):
+    """This form is used in intermediate page that sets the name of the cloned zone."""
+    clone_domain_name = forms.CharField(max_length=255, required=True, label=_('Domain Name'), help_text="""Enter the domain name of the clone.""")
+    
+    def clean_clone_domain_name(self):
+        clone_domain_name = self.cleaned_data.get('clone_domain_name')
+        
+        # 1) Check for valid characters
+        validate_hostname(clone_domain_name, supports_cidr_notation=True)
+        
+        # 2) Check for uniqueness
+        Domain = cache.get_model('powerdns_manager', 'Domain')
+        try:
+            domain_obj = Domain.objects.get(name=clone_domain_name)
+        except Domain.DoesNotExist:
+            pass
+        else:
+            raise forms.ValidationError('A zone with this name already exists. Please enter a new domain name.')
+        
+        return clone_domain_name
 

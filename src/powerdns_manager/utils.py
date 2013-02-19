@@ -105,6 +105,30 @@ def validate_hostname(hostname,
         raise ValidationError('The hostname contains illegal characters')
 
 
+def interchange_domain(data, domain1, domain2):
+    """Replaces domain1 with domain2 in data.
+    
+    data: RR's name or content
+    
+    Replacement occurs only in the base domain.
+    
+    TODO: improve this description.
+    
+    """
+    if len(domain1) > len(data):
+        return data
+    elif not data.endswith(domain1):
+        return data
+    elif data == domain1:
+        return domain2
+    
+    data_parts = data.split('.')
+    domain1_parts = domain1.split('.')
+    
+    new_data_parts = data_parts[:-len(domain1_parts)]
+    return '%s.%s' % ('.'.join(new_data_parts), domain2) 
+
+
 def generate_serial(serial_old=None):
     """Return a serial number for the zone in the form YYYYMMDDNN.
     

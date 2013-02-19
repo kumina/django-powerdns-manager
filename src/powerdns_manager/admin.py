@@ -60,6 +60,7 @@ from powerdns_manager.actions import set_domain_type_bulk
 from powerdns_manager.actions import set_ttl_bulk
 from powerdns_manager.actions import force_serial_update
 from powerdns_manager.actions import reset_api_key
+from powerdns_manager.actions import clone_zone
 from powerdns_manager.utils import generate_api_key
 
 
@@ -248,7 +249,7 @@ class DomainAdmin(admin.ModelAdmin):
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
-    actions = [reset_api_key, set_domain_type_bulk, set_ttl_bulk, force_serial_update]
+    actions = [reset_api_key, set_domain_type_bulk, set_ttl_bulk, force_serial_update, clone_zone]
     change_list_template = 'powerdns_manager/domain_changelist.html'
     
     #
