@@ -333,6 +333,7 @@ def clone_zone(modeladmin, request, queryset):
                     content_parts = rr.content.split()
                     # target
                     content_parts[2] = interchange_domain(content_parts[2], domain_obj.name, clone_domain_name)
+                    clone_rr_content = ' '.join(content_parts)
                 else:
                     clone_rr_content = interchange_domain(rr.content, domain_obj.name, clone_domain_name)
                 
