@@ -291,6 +291,7 @@ def clone_zone(modeladmin, request, queryset):
         form = ClonedZoneDomainForm(request.POST)
         if form.is_valid():
             
+            # Store the new domain name for the clone.
             clone_domain_name = form.cleaned_data['clone_domain_name']
             
             if not clone_domain_name:
@@ -320,7 +321,7 @@ def clone_zone(modeladmin, request, queryset):
                 # Construct RR name with interchanged domain
                 clone_rr_name = interchange_domain(rr.name, domain_obj.name, clone_domain_name)
                 
-                # Special treatment to the content of SOA and SRV
+                # Special treatment to the content of SOA and SRV RRs
                 if rr.type == 'SOA':
                     content_parts = rr.content.split()
                     # primary
@@ -338,6 +339,7 @@ def clone_zone(modeladmin, request, queryset):
                 else:
                     clone_rr_content = interchange_domain(rr.content, domain_obj.name, clone_domain_name)
                 
+                # Create and save the cloned record.
                 clone_rr = Record(
                     domain = clone_obj,
                     name = clone_rr_name,
@@ -350,9 +352,6 @@ def clone_zone(modeladmin, request, queryset):
                 )
                 clone_rr.save()
                 modeladmin.log_addition(request, clone_rr)
-            
-            # Update the domain serial
-            #domain_obj.update_serial()
             
             messages.info(request, 'Successfully cloned %s zone to %s' % \
                 (domain_obj.name, clone_domain_name))
