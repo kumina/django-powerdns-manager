@@ -39,6 +39,34 @@ from powerdns_manager.utils import validate_hostname
 
 
 
+class DomainModelForm(forms.ModelForm):
+    """Base ModelForm for zone instances.
+    
+    """
+    class Meta:
+        model = cache.get_model('powerdns_manager', 'Domain')
+        
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        validate_hostname(name, supports_cidr_notation=True)
+        return name
+    
+    def clean_master(self):
+        """Cleans the 'master' field.
+        
+        Expected value is a comma-delimited list of nameservers.
+        The list may contain hostnames and IP addresses.
+        
+        TODO: This field is valid only for slave zones
+        
+        """
+        master = self.cleaned_data.get('master')
+        master_servers = [m.strip() for m in master.split(',') if m.strip()]
+        for master_server in master_servers:
+            validate_hostname(master_server, reject_ip=False)
+        return master
+
+
 class BaseRecordModelForm(forms.ModelForm):
     """Base ModelForm for Record instances.
     

@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.crypto import get_random_string
 
 from powerdns_manager import settings
+from powerdns_manager.forms import DomainModelForm
 from powerdns_manager.forms import SoaRecordModelForm
 from powerdns_manager.forms import NsRecordModelForm
 from powerdns_manager.forms import MxRecordModelForm
@@ -238,9 +239,7 @@ class CryptoKeyInline(admin.TabularInline):
 
 
 class DomainAdmin(admin.ModelAdmin):
-    #form = DomainModelForm
-    #actions = [test_action, ]
-    
+    form = DomainModelForm
     fields = ('date_modified', 'name', 'type', 'master')
     readonly_fields = ('date_modified', )
     list_display = ('name', 'export_zone_html_link', 'type', 'master', 'date_modified')
