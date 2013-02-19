@@ -612,6 +612,8 @@ class TtlSelectionForm(forms.Form):
 class ClonedZoneDomainForm(forms.Form):
     """This form is used in intermediate page that sets the name of the cloned zone."""
     clone_domain_name = forms.CharField(max_length=255, required=True, label=_('Domain Name'), help_text="""Enter the domain name of the clone.""")
+    option_clone_dynamic = forms.BooleanField(required=False, initial=True, label=_('Clone dynamic setting'), help_text="""If checked and the original zone is marked as dynamic, then the clone will also be marked as dynamic and a new API key will be generated.""")
+    option_clone_metadata = forms.BooleanField(required=False, initial=True, label=_('Clone zone metadata'), help_text="""If checked, the metadata associated with the original zone will be cloned too.""")
     
     def clean_clone_domain_name(self):
         clone_domain_name = self.cleaned_data.get('clone_domain_name')

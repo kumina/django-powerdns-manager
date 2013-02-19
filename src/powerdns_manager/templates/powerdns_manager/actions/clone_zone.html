@@ -35,6 +35,19 @@
                 <div class="form-row">
                     {{ form.clone_domain_name.errors }}
                     <label for="id_clone_domain_name" class="">{% trans 'Domain Name' %}:</label>{{ form.clone_domain_name }}
+                    <p>{{ form.clone_domain_name.help_text }}</p>
+                </div>
+                
+                <div class="form-row">
+                    {{ form.option_clone_dynamic.errors }}
+                    <label for="id_option_clone_dynamic" class="">{% trans 'Clone dynamic setting' %}:</label>{{ form.option_clone_dynamic }}
+                    <p>{{ form.option_clone_dynamic.help_text }}</p>
+                </div>
+                
+                <div class="form-row">
+                    {{ form.option_clone_metadata.errors }}
+                    <label for="id_option_clone_metadata" class="">{% trans 'Clone zone metadata' %}:</label>{{ form.option_clone_metadata }}
+                    <p>{{ form.option_clone_metadata.help_text }}</p>
                 </div>
                 
             </fieldset>

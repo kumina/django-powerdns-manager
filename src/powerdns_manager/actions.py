@@ -299,16 +299,21 @@ def clone_zone(modeladmin, request, queryset):
         form = ClonedZoneDomainForm(request.POST)
         if form.is_valid():
             
+            # Store Data from the form
+            
             # Store the new domain name for the clone.
             clone_domain_name = form.cleaned_data['clone_domain_name']
             
             if not clone_domain_name:
                 return None # Should never happen
+
+            option_clone_dynamic = form.cleaned_data['option_clone_dynamic']
+            option_clone_metadata = form.cleaned_data['option_clone_metadata']
+            
+            # Clone base zone
             
             # At this point queryset contain exactly one object. Checked above.
             domain_obj = queryset[0]
-            
-            # Clone base zone
             
             # Create the clone (Check for uniqueness takes place in forms.ClonedZoneDomainForm 
             clone_obj = Domain.objects.create(
@@ -367,30 +372,34 @@ def clone_zone(modeladmin, request, queryset):
             
             # Clone Dynamic Zone setting
             
-            # Get the base domain's dynamic zone.
-            # There is only one Dynamic Zone object for each zone.
-            domain_dynzone_obj = DynamicZone.objects.get(domain=domain_obj)
-            
-            # Create and save the dynamic zone object for the clone.
-            clone_dynzone_obj = DynamicZone(
-                domain = clone_obj,
-                is_dynamic = domain_dynzone_obj.is_dynamic
-                )
-            clone_dynzone_obj.save()
+            if option_clone_dynamic:
+                
+                # Get the base domain's dynamic zone.
+                # There is only one Dynamic Zone object for each zone.
+                domain_dynzone_obj = DynamicZone.objects.get(domain=domain_obj)
+                
+                # Create and save the dynamic zone object for the clone.
+                clone_dynzone_obj = DynamicZone(
+                    domain = clone_obj,
+                    is_dynamic = domain_dynzone_obj.is_dynamic
+                    )
+                clone_dynzone_obj.save()
             
             # Clone the zone's metadata
             
-            # Get the base domain's metadata object.
-            # There is only one metadata object for each zone.
-            domain_metadata_obj = DomainMetadata.objects.get(domain=domain_obj)
-            
-            # Create and save the metadata object for the clone.
-            clone_metadata_obj = DomainMetadata(
-                domain = clone_obj,
-                kind = domain_metadata_obj.kind,
-                content = domain_metadata_obj.content
-                )
-            clone_metadata_obj.save()
+            if option_clone_metadata:
+                
+                # Get the base domain's metadata object.
+                # There is only one metadata object for each zone.
+                domain_metadata_obj = DomainMetadata.objects.get(domain=domain_obj)
+                
+                # Create and save the metadata object for the clone.
+                clone_metadata_obj = DomainMetadata(
+                    domain = clone_obj,
+                    kind = domain_metadata_obj.kind,
+                    content = domain_metadata_obj.content
+                    )
+                clone_metadata_obj.save()
             
             messages.info(request, 'Successfully cloned %s zone to %s' % \
                 (domain_obj.name, clone_domain_name))
