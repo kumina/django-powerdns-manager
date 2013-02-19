@@ -267,7 +267,8 @@ def clone_zone(modeladmin, request, queryset):
     Domain = cache.get_model('powerdns_manager', 'Domain')
     Record = cache.get_model('powerdns_manager', 'Record')
     DynamicZone = cache.get_model('powerdns_manager', 'DynamicZone')
-
+    DomainMetadata = cache.get_model('powerdns_manager', 'DomainMetadata')
+    
     # Check the number of selected zones. This action can work on a single zone.
     
     n = queryset.count()
@@ -376,6 +377,20 @@ def clone_zone(modeladmin, request, queryset):
                 is_dynamic = domain_dynzone_obj.is_dynamic
                 )
             clone_dynzone_obj.save()
+            
+            # Clone the zone's metadata
+            
+            # Get the base domain's metadata object.
+            # There is only one metadata object for each zone.
+            domain_metadata_obj = DomainMetadata.objects.get(domain=domain_obj)
+            
+            # Create and save the metadata object for the clone.
+            clone_metadata_obj = DomainMetadata(
+                domain = clone_obj,
+                kind = domain_metadata_obj.kind,
+                content = domain_metadata_obj.content
+                )
+            clone_metadata_obj.save()
             
             messages.info(request, 'Successfully cloned %s zone to %s' % \
                 (domain_obj.name, clone_domain_name))
