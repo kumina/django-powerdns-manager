@@ -231,6 +231,7 @@ class Record(models.Model):
         return super(Record, self).save(*args, **kwargs)
 
     def as_zone_format(self):
+        """ Return a string containing the Record as a BIND-style zone entry"""
         if self.type in ['SRV', 'MX']: # These records use a priority field
             return '%s %d IN %s %d %s' % (self.name, self.ttl, self.type,
                     self.prio, self.content)
