@@ -258,3 +258,135 @@ def dynamic_ip_update_view(request):
     else:
         return HttpResponseNotFound('error:No suitable resource record found')
 
+
+@csrf_exempt
+def api_v1_records_view(request, name, type=False, return_format=False):
+    # Sanitize all elements of the input
+    if request.method not in ['GET','POST','PUT','DELETE']:
+        return HttpResponseNotAllowed(['GET','POST','PUT','DELETE'])
+
+    if return_format:
+        return_format = return_format.lstrip('.')
+    else:
+        return_format = 'zone'
+    if return_format not in ['zone']:
+        return HttpResponseNotFound('Return format %s unknown' % return_format)
+
+    try:
+        content_search = request.REQUEST['content_search']
+    except KeyError:
+        content_search = None
+
+    try:
+        content_match = request.REQUEST['content_match']
+    except KeyError:
+        content_match = None
+    if content_match and content_search:
+        return HttpResponseBadRequest('Both "content_search" and "content_match" are requested')
+
+    try:
+        content_set = request.REQUEST['content_set']
+    except KeyError:
+        content_set = None
+
+    try:
+        ttl_set = request.REQUEST['ttl_set']
+    except KeyError:
+        ttl_set = None
+
+    if (ttl_set or content_set) and request.method in ['DELETE','GET']:
+        return HttpResponseBadRequest('HTTP %s sent, but set parameters are included in the request')
+
+    if type:
+        type = type.upper()
+
+    try:
+        api_key = request.META['HTTP_X_PDNS_APIKEY']
+    except KeyError:
+        return HttpResponseBadRequest('No X-PDNS-APIKEY header sent')
+
+    DynamicZone = cache.get_model('powerdns_manager', 'DynamicZone')
+    Record = cache.get_model('powerdns_manager', 'Record')
+
+    # Get all the records associated with name (and type)
+    dyn_zone = DynamicZone.objects.get(api_key__exact=api_key)
+
+    # Filter on what the user searches for
+    dyn_rrs = Record.objects.filter(domain=dyn_zone.domain, name=name)
+    resp = 'records of %s IN' % name
+    if type:
+        dyn_rrs = dyn_rrs.filter(type=type)
+        resp += ' ' + type
+    if content_search:
+        dyn_rrs = dyn_rrs.filter(content__contains=content_search)
+        resp += ' with (partial) content %s' % content_search
+    if content_match:
+        dyn_rrs = dyn_rrs.filter(content__exact=content_match)
+        resp += ' with content %s' % content_match
+
+    if request.method == 'GET':
+        if dyn_rrs:
+            res = ''
+            for rr in dyn_rrs:
+                res += rr.as_(return_format) + '\n'
+            return HttpResponse(res)
+
+        return HttpResponseNotFound('No %s found' % resp)
+
+    if request.method == 'DELETE':
+        if not dyn_rrs:
+            return HttpResponse('No %s found, nothing removed' % resp)
+        # if there is no type set, we refuse to remove records that are 'zone'
+        # records (SOA, NS, MX etc..)
+        if not type and dyn_zone.domain == dyn_rrs[0].domain:
+            return HttpResponseBadRequest('Cowardly refusing to remove all zone-records')
+
+        # Sanity checking done, pulling the trigger
+        remove_count = len(dyn_rrs)
+        for rr in dyn_rrs:
+            rr.delete()
+        return HttpResponse('Deleted %d %s ' % (remove_count,resp))
+
+    # When we're here in the code-flow, there is either an addition or a change
+    # requested. Let's do some checking for all the data we need
+    if not type:
+        return HttpResponseBadRequest('No record type supplied')
+
+    if request.method == 'POST':
+        if content_search or content_match:
+            return HttpResponseBadRequest('Searching or Matching of content requested')
+        if not content_set:
+            return HttpResponseBadRequest('No content_set parameter in request')
+
+        if len(dyn_rrs.filter(content=content_set)) > 0: # there exists a record
+            return HttpResponse('There exists %s with value %s, doing nothing' %
+                (resp, content_set))
+
+        if not ttl_set:
+            ttl_set = dyn_zone.domain.get_minimum_ttl()
+
+        record = Record( name = name,
+                type = type,
+                domain = dyn_zone.domain,
+                content = content_set,
+                ttl = ttl_set
+                )
+        record.save()
+        return HttpResponse(record.as_(return_format))
+
+    if request.method == 'PUT':
+        if (not content_search and not content_match) and len(dyn_rrs) > 1:
+            HttpResponseBadRequest('More than one %s found, please supply content_search or content_match parameters'
+                    % resp)
+
+        if len(dyn_rrs) == 1:
+            if content_set:
+                dyn_rrs[0].content = content_set
+            if ttl_set:
+                dyn_rrs[0].ttl = ttl_set
+            dyn_rrs[0].save()
+            return HttpResponse(dyn_rrs[0].as_(return_format))
+
+        if len(dyn_rrs) == 0:
+            return HttpResponseBadRequest('There exists no %s, doing nothing' %
+                    resp)
