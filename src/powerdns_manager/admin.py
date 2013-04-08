@@ -94,7 +94,7 @@ class BaseTabularRecordInline(admin.TabularInline):
     def queryset(self, request):
         """Return only RR_TYPE records"""
         qs = super(BaseTabularRecordInline, self).queryset(request)
-        return qs.filter(type=self.RR_TYPE)
+        return qs.filter(type=self.RR_TYPE).order_by('name')
 
 
 
