@@ -335,17 +335,18 @@ def api_v1_records_view(request, name, type=False, return_format=False):
 
     if request.method == 'DELETE':
         if not dyn_rrs:
-            return HttpResponse('No %s found, nothing removed' % resp)
+            return HttpResponse('')
         # if there is no type set, we refuse to remove records that are 'zone'
         # records (SOA, NS, MX etc..)
-        if not type and dyn_zone.domain == dyn_rrs[0].domain:
+        if not type and dyn_zone.domain == dyn_rrs[0].name:
             return HttpResponseBadRequest('Cowardly refusing to remove all zone-records')
 
         # Sanity checking done, pulling the trigger
-        remove_count = len(dyn_rrs)
+        res = ''
         for rr in dyn_rrs:
+            res += rr.as_(return_format)
             rr.delete()
-        return HttpResponse('Deleted %d %s ' % (remove_count,resp))
+        return HttpResponse(res)
 
     # When we're here in the code-flow, there is either an addition or a change
     # requested. Let's do some checking for all the data we need
@@ -376,7 +377,7 @@ def api_v1_records_view(request, name, type=False, return_format=False):
 
     if request.method == 'PUT':
         if (not content_search and not content_match) and len(dyn_rrs) > 1:
-            HttpResponseBadRequest('More than one %s found, please supply content_search or content_match parameters'
+            return HttpResponseBadRequest('More than one %s found, please supply content_search or content_match parameters'
                     % resp)
 
         if len(dyn_rrs) == 1:
