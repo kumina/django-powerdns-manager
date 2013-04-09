@@ -174,7 +174,9 @@ def generate_serial_timestamp(old_serial=None, is_timestamp=True):
 
 def generate_api_key():
     return get_random_string(
-        length=24, allowed_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        length=96,
+        allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    )
 
 
 def process_zone_file(origin, zonetext, overwrite=False):
