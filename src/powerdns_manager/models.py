@@ -230,22 +230,22 @@ class Record(models.Model):
         
         return super(Record, self).save(*args, **kwargs)
 
-    def as_zone_format(self):
+    def as_zone(self):
         """ Return a string containing the Record as a RFC1035 zone entry"""
         if self.type in ['SRV', 'MX']: # These records use a priority field
-            return '%s %s IN %s %d %s' % (self.name, self.ttl, self.type,
+            return '%s %s IN %s %s %s' % (self.name, self.ttl, self.type,
                     self.prio, self.content)
         else:
-            return '%s. %s IN %s %s' % (self.name, self.ttl, self.type,
+            return '%s %s IN %s %s' % (self.name, self.ttl, self.type,
                     self.content)
 
-    def as_format(self, format='zone'):
+    def as_(self, format='zone'):
         """ Return the record as format
         Valid values are:
             - 'zone'
         """
         if format in ['zone']:
-            return eval('self.as_%s_format()' % format)
+            return eval('self.as_%s()' % format)
 
 class SuperMaster(models.Model):
     """Model for PowerDNS supermasters.
