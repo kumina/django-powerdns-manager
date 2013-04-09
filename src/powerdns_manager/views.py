@@ -391,3 +391,6 @@ def api_v1_records_view(request, name, type=False, return_format=False):
         if len(dyn_rrs) == 0:
             return HttpResponseBadRequest('There exists no %s, doing nothing' %
                     resp)
+
+@csrf_exempt
+def api_v1_zone_view(request, name, action, return_format=False):
