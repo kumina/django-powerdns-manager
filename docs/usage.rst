@@ -65,6 +65,78 @@ Example request using ``curl``::
 
 TODO
 
+RESTful API version 1
+=====================
+The REST API version 1 a very simple, non-JSON API that allows the external
+party to CRUD records. A second API allows the external party to change zone
+settings.
+
+To access the API, an apikey needs to be supplied via the ``X-PDNS-APIKEY`` HTTP
+header.
+
+HTTP Methods supported
+----------------------
+
+``GET``
+  This returns all records matching the name, type and content (see below for
+  filtering options).
+``POST``
+  This request allows the creation of records. Use parameters and options to 
+  set the correct data (see below).
+``DELETE``
+  Delete records matching the parameters.
+``PUT``
+  Update the ttl or content of a single record.
+
+Request syntax
+--------------
+
+    /api_v1/records/NAME[/TYPE][.FORMAT]
+
+``NAME``
+  The name associated with the the record (e.g. www.example.net) *mandatory*.
+``TYPE``
+  The type of the records (e.g. A, AAAA, CNAME etc.). It is *mandatory* for
+  POST requests and *optional* for the other requests.
+``FORMAT``
+  The preferred output format of the response. There is only one possible
+  value: zone. On a succesful request, the records are returned.
+
+The API accepts several parameters:
+
+``content_match``and ``content_search``
+  Useful with GET, PUT and DELETE, they will filter on the content of the
+  records. content_match means 'exacts match', whereas content_search means
+  'substring'.
+``content_set`` and ``ttl_set``
+  These parameters are useful with PUT and POST request. They set the content
+  and ttl of the record respectively.
+
+Examples
+--------
+Adding a record::
+
+    curl -X POST \
+    -H 'X-PDNS-APIKEY: FFFFFFFFFFFFFFFFFFFFFFFF' \
+    "https://dnsadmin/powerdns/api_v1/records/www.example.net/A?content_set=1.2.3.4"
+
+Updating the created record::
+
+    curl -X PUT \
+    -H 'X-PDNS-APIKEY: FFFFFFFFFFFFFFFFFFFFFFFF' \
+    "https://dnsadmin/powerdns/api_v1/records/www.example.net/A?content_match=1.2.3.4&content_set=2.3.4.5&ttl_set=1200"
+
+Deleting all A records for www.example.net::
+
+    curl -X DELETE \
+    -H 'X-PDNS-APIKEY: FFFFFFFFFFFFFFFFFFFFFFFF' \
+    "https://dnsadmin/powerdns/api_v1/records/www.example.net/A"
+
+Deleting all records for www.example.net::
+
+    curl -X DELETE \
+    -H 'X-PDNS-APIKEY: FFFFFFFFFFFFFFFFFFFFFFFF' \
+    "https://dnsadmin/powerdns/api_v1/records/www.example.net"
 
 Import zone files
 =================
