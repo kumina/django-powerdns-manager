@@ -309,7 +309,10 @@ def api_v1_records_view(request, name, type=False, return_format=False):
     Record = cache.get_model('powerdns_manager', 'Record')
 
     # Get all the records associated with name (and type)
-    dyn_zone = DynamicZone.objects.get(api_key__exact=api_key)
+    try:
+        dyn_zone = DynamicZone.objects.get(api_key__exact=api_key)
+    except:
+        return HttpResponseNotFound('api_key invalid')
 
     # Filter on what the user searches for
     dyn_rrs = Record.objects.filter(domain=dyn_zone.domain, name=name)
@@ -392,5 +395,5 @@ def api_v1_records_view(request, name, type=False, return_format=False):
             return HttpResponseBadRequest('There exists no %s, doing nothing' %
                     resp)
 
-@csrf_exempt
-def api_v1_zone_view(request, name, action, return_format=False):
+#@csrf_exempt
+#def api_v1_zone_view(request, name, action, return_format=False):

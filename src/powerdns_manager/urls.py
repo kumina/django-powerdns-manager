@@ -33,6 +33,6 @@ urlpatterns = patterns('powerdns_manager.views',
     url(r'^update/$', 'dynamic_ip_update_view', name='dynamic_ip_update'),
     url(r'^api_v1/records/(?P<name>[^/]+)/?(?P<type>[^./]+)?(?P<return_format>\..+)?',
         'api_v1_records_view', name='api_v1_records'),
-    url(r'^api_v1/zone/(?P<name>[^/]+)/(?P<action>[^.]+)(?P<return_format>\..*)?$', 'api_v1_zone_view',
-        name='api_v1_zone'),
+#    url(r'^api_v1/zone/(?P<name>[^/]+)/(?P<action>[^.]+)(?P<return_format>\..*)?$', 'api_v1_zone_view',
+#        name='api_v1_zone'),
 )
