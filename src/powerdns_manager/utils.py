@@ -354,6 +354,7 @@ def process_and_import_zone_data(zone, overwrite=False):
                     # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.IN.SRV.SRV-class.html
                     rr.type = 'SRV'
                     rr.content = '%d %d %s' % (rdata.weight, rdata.port, str(rdata.target).rstrip('.'))
+                    rr.prio = rdata.priority
                 
                 rr.save()
     
