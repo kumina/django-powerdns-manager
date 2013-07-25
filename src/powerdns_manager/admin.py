@@ -85,6 +85,9 @@ class BaseTabularRecordInline(admin.TabularInline):
     model = cache.get_model('powerdns_manager', 'Record')
     extra = 0
     fields = ('name', 'ttl', 'content')
+    # Django throws ListIndex out of range errors at 1000 records, let's raise
+    # it
+    max_num = 30000
     
     def __init__(self, *args, **kwargs):
         self.verbose_name = '%s Resource Record' % self.RR_TYPE
